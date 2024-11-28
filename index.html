@@ -5,67 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <style>
+    /* Styles identiques à la version précédente */
     body {
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #e0f7ff, #ffffff);
+      background: linear-gradient(to bottom, #f5faff, #d6ebff);
       color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
-      scroll-behavior: smooth;
     }
 
     header {
-      background-color: #004aad;
+      background-color: #0056b3;
       color: white;
       width: 100%;
       text-align: center;
-      padding: 30px 0;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+      padding: 20px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-bottom: 4px solid #003d80;
     }
 
     header img {
-      width: 80px;
+      width: 70px;
       margin-bottom: 10px;
+      border-radius: 50%;
+      border: 2px solid white;
     }
 
     header h1 {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 24px;
       margin: 0;
     }
 
     nav {
-      background-color: #0056b3;
+      background-color: #007bff;
       width: 100%;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
       z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     nav button {
       background: none;
       border: none;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 10px 15px;
+      font-size: 14px;
       cursor: pointer;
       color: white;
       font-weight: bold;
       border-radius: 20px;
-      transition: all 0.3s ease;
+      text-align: center;
+      transition: background-color 0.3s ease;
     }
 
     nav button.active {
       background-color: white;
-      color: #0056b3;
+      color: #007bff;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
@@ -75,8 +77,8 @@
       margin: 20px auto;
       padding: 20px;
       background: white;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
       display: none;
       animation: fadeIn 0.5s ease-in-out;
     }
@@ -86,54 +88,41 @@
     }
 
     h2 {
-      color: #004aad;
-      font-size: 22px;
-      border-bottom: 2px solid #004aad;
+      color: #0056b3;
+      border-bottom: 2px solid #0056b3;
       padding-bottom: 5px;
       margin-bottom: 15px;
     }
 
-    label {
-      font-weight: bold;
-      margin-top: 20px;
-      display: block;
-      font-size: 16px;
-    }
-
-    select, textarea, input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    textarea {
-      height: 80px;
-      resize: none;
-    }
-
-    textarea::placeholder, select::placeholder {
-      color: #aaa;
-    }
-
     button {
       width: 100%;
-      padding: 12px;
-      background-color: #004aad;
+      padding: 15px;
+      background-color: #0056b3;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
       margin-top: 20px;
-      font-weight: bold;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #00337a;
+      background-color: #003d80;
+    }
+
+    textarea, select, input[type="file"] {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea::placeholder, select::placeholder {
+      color: #999;
     }
 
     .result {
@@ -144,17 +133,16 @@
       white-space: pre-wrap;
       font-size: 14px;
       font-family: 'Roboto Mono', monospace;
-      border-left: 4px solid #004aad;
     }
 
     footer {
-      background-color: #004aad;
+      background-color: #0056b3;
       color: white;
-      padding: 15px 0;
+      padding: 10px 0;
       text-align: center;
       margin-top: 20px;
       width: 100%;
-      font-size: 14px;
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
     }
 
     @keyframes fadeIn {
@@ -182,6 +170,7 @@
     <button onclick="showStep(4)">Treatment</button>
   </nav>
 
+  <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
     <h2>Patient Information</h2>
     <label for="gender">Gender:</label>
@@ -221,6 +210,7 @@
     <textarea id="conditions" placeholder="Example: Diabetes, hypertension, etc."></textarea>
   </div>
 
+  <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
     <h2>Symptoms and Medical Analysis</h2>
     <textarea id="symptoms" placeholder="Example: Back pain, muscle weakness..."></textarea>
@@ -228,12 +218,14 @@
     <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
   </div>
 
+  <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
     <h2>Diagnosis</h2>
     <button onclick="generateDiagnosis()">Get Diagnosis</button>
     <div id="diagnosisResult" class="result">Diagnosis result: Awaiting...</div>
   </div>
 
+  <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Treatment Plan</h2>
     <div id="treatmentPlan" class="result">
@@ -269,7 +261,7 @@
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
 
-      diagnosisResult.textContent = "Analyzing...";
+      diagnosisResult.textContent = "Analyse en cours...";
 
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
@@ -282,17 +274,61 @@
             messages: [
               {
                 role: "user",
-                content: `Patient Info: Gender: ${gender}, Age: ${age}, Weight: ${weight}, Height: ${height}, Sport: ${sport}, Conditions: ${conditions}, Symptoms: ${symptoms}`,
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
               },
             ],
           }),
         });
 
         const data = await response.json();
-        diagnosisResult.textContent = data.content.trim();
+        const diagnosisText = data.content.trim();
+        diagnosisResult.textContent = diagnosisText;
+
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
       } catch (error) {
-        diagnosisResult.textContent = "Error analyzing the diagnosis.";
-        console.error("Error:", error);
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
+        console.error("Erreur API:", error);
+      }
+    }
+
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
+      const treatmentPlan = document.getElementById("treatmentPlan");
+      treatmentPlan.textContent = "Création du plan de traitement en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            messages: [
+              {
+                role: "user",
+                content: `
+Patient: 
+- Genre: ${gender}
+- Âge: ${age}
+- Poids: ${weight}
+- Taille: ${height}
+- Sport: ${sport}
+- Conditions médicales spécifiques: ${conditions}
+- Symptômes: ${symptoms}
+
+Diagnostic: ${diagnosis}
+
+Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ne donnez pas de diagnostic. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        treatmentPlan.textContent = data.content.trim();
+      } catch (error) {
+        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
+        console.error("Erreur complète :", error);
       }
     }
   </script>
