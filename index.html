@@ -232,9 +232,9 @@ En attente d'un diagnostic pour générer un plan de traitement...
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
       const treatmentPlan = document.getElementById("treatmentPlan");
-
+    
       diagnosisResult.textContent = "Analyse en cours...";
-
+    
       try {
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
@@ -243,24 +243,34 @@ En attente d'un diagnostic pour générer un plan de traitement...
             "Authorization": "Bearer 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"
           },
           body: JSON.stringify({
-            model: "gpt-4-turbo",
+            model: "gpt-4-1106-preview", // Mise à jour du nom du modèle
             messages: [
-              { role: "system", content: "Vous êtes un assistant expert en kinésithérapie et n'utilisez que les connaissances issues des études scientifiques les plus sériuses et les plus récentes. Vous n'inventez jmais rien. Vous êtes extrêmment précis et rigoureux." },
-              { role: "user", content: `Symptômes du patient : ${symptoms}` }
-            ]
+              {
+                role: "system",
+                content: "Vous êtes un assistant expert en kinésithérapie et n'utilisez que les connaissances issues des études scientifiques les plus sériuses et les plus récentes. Vous n'inventez jmais rien. Vous êtes extrêmment précis et rigoureux."
+              },
+              {
+                role: "user",
+                content: `Symptômes du patient : ${symptoms}`
+              }
+            ],
+            max_tokens: 500
           })
         });
-
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'Erreur API');
+        }
+    
         const data = await response.json();
         const diagnosis = data.choices[0].message.content;
-
+    
         diagnosisResult.textContent = diagnosis;
-
-        treatmentPlan.textContent =
-          "Plan de traitement basé sur le diagnostic :\n- Renforcement musculaire\n- Étirements\n- Thérapie adaptée\n\nFréquence : 3 fois par semaine.";
+        treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
       } catch (error) {
-        diagnosisResult.textContent =
-          "Erreur lors de l'établissement du diagnostic.";
+        console.error('Erreur détaillée:', error);
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
       }
     }
 
