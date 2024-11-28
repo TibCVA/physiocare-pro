@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PhysioCare Pro</title>
   <style>
-    /* Styles globaux */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
@@ -236,11 +235,10 @@ En attente d'un diagnostic pour générer un plan de traitement...
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 1000,
             messages: [
               {
                 role: "user",
-                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight} kg, Taille : ${height} cm, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
+                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
               },
             ],
           }),
