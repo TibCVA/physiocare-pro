@@ -110,7 +110,7 @@
       padding: 15px;
       border-radius: 5px;
       margin-top: 10px;
-      white-space: pre-wrap; /* Correct alignment for bullet points */
+      white-space: pre-wrap;
     }
 
     footer {
@@ -122,7 +122,6 @@
       width: 100%;
     }
 
-    /* Prevent the page from moving horizontally on mobile */
     html, body {
       overflow-x: hidden;
     }
@@ -245,52 +244,23 @@ En attente d'un diagnostic pour générer un plan de traitement...
             messages: [
               {
                 role: "user",
-                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
               },
             ],
           }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Erreur API :", errorData);
-          throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
-        }
-
         const data = await response.json();
-        if (!data?.content || typeof data.content !== "string") {
-          throw new Error("Réponse de Claude mal formatée ou vide.");
-        }
-
         const diagnosisText = data.content.trim();
         diagnosisResult.textContent = diagnosisText;
 
-        generateTreatmentPlan(
-          gender,
-          age,
-          weight,
-          height,
-          sport,
-          conditions,
-          symptoms,
-          diagnosisText
-        );
-      } catch (error) {
-        diagnosisResult.textContent =
-          "Erreur lors de l'établissement du diagnostic.";
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
+      } catch {
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
       }
     }
 
-    async function generateTreatmentPlan(
-      gender,
-      age,
-      weight,
-      height,
-      sport,
-      conditions,
-      symptoms,
-      diagnosis
-    ) {
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
       const treatmentPlan = document.getElementById("treatmentPlan");
 
       treatmentPlan.textContent = "Création du plan de traitement en cours...";
@@ -306,28 +276,16 @@ En attente d'un diagnostic pour générer un plan de traitement...
             messages: [
               {
                 role: "user",
-                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}, Diagnostic : ${diagnosis}. Génère un plan de traitement rigoureux et précis sous forme de bullet points uniquement.`,
+                content: `Protocole de traitement pour: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}, Diagnostic : ${diagnosis}. Donnez un plan de traitement précis, rigoureux et synthétique sous forme de bullet points uniquement.`,
               },
             ],
           }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Erreur API :", errorData);
-          throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
-        }
-
         const data = await response.json();
-        if (!data?.content || typeof data.content !== "string") {
-          throw new Error("Réponse de Claude mal formatée ou vide.");
-        }
-
-        const treatmentText = data.content.trim();
-        treatmentPlan.textContent = treatmentText;
-      } catch (error) {
-        treatmentPlan.textContent =
-          "Erreur lors de la création du plan de traitement.";
+        treatmentPlan.textContent = data.content.trim();
+      } catch {
+        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
       }
     }
   </script>
