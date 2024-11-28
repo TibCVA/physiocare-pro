@@ -35,7 +35,7 @@
       background-color: #f5faff;
       width: 100%;
       display: flex;
-      justify-content: space-between; /* Align buttons to distribute them evenly */
+      justify-content: space-around;
       padding: 10px 0;
       border-bottom: 2px solid #e0e0e0;
       position: sticky;
@@ -46,14 +46,13 @@
     nav button {
       background: none;
       border: none;
-      padding: 10px 5px;
-      font-size: 14px;
+      padding: 10px 15px;
+      font-size: 16px;
       cursor: pointer;
       color: #007bff;
       font-weight: bold;
       border-radius: 10px;
-      flex-grow: 1; /* Equal space for each button */
-      text-align: center;
+      white-space: nowrap;
     }
 
     nav button.active {
@@ -135,10 +134,10 @@
   </header>
 
   <nav>
-    <button class="active" onclick="showStep(1)">Infos Patient</button>
-    <button onclick="showStep(2)">Symptômes</button>
+    <button class="active" onclick="showStep(1)">Informations Patient</button>
+    <button onclick="showStep(2)">Symptômes et analyses médicales</button>
     <button onclick="showStep(3)">Diagnostic</button>
-    <button onclick="showStep(4)">Traitement</button>
+    <button onclick="showStep(4)">Plan de Traitement</button>
   </nav>
 
   <!-- Étape 1 : Informations Patient -->
@@ -220,6 +219,74 @@ En attente d'un diagnostic pour générer un plan de traitement...
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
+    }
+
+    async function generateDiagnosis() {
+      const gender = document.getElementById("gender").value;
+      const age = document.getElementById("age").value;
+      const weight = document.getElementById("weight").value;
+      const height = document.getElementById("height").value;
+      const sport = document.getElementById("sport").value;
+      const conditions = document.getElementById("conditions").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+
+      diagnosisResult.textContent = "Analyse en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            messages: [
+              {
+                role: "user",
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        const diagnosisText = data.content.trim();
+        diagnosisResult.textContent = diagnosisText;
+
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
+      } catch {
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
+      }
+    }
+
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
+      const treatmentPlan = document.getElementById("treatmentPlan");
+
+      treatmentPlan.textContent = "Création du plan de traitement en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            messages: [
+              {
+                role: "user",
+                content: `Protocole de traitement pour: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}, Diagnostic : ${diagnosis}. Donnez un plan de traitement précis, rigoureux et synthétique sous forme de bullet points uniquement.`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        treatmentPlan.textContent = data.content.trim();
+      } catch {
+        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
+      }
     }
   </script>
 </body>
