@@ -233,14 +233,14 @@ En attente d'un diagnostic pour générer un plan de traitement...
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
       const treatmentPlan = document.getElementById("treatmentPlan");
-
+    
       if (!symptoms.trim()) {
         diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes";
         return;
       }
-
+    
       diagnosisResult.textContent = "Analyse en cours...";
-
+    
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
@@ -253,32 +253,28 @@ En attente d'un diagnostic pour générer un plan de traitement...
             messages: [{
               role: "user",
               content: symptoms
-            }],
-            system: "Vous êtes un assistant expert en kinésithérapie et n'utilisez que les connaissances issues des études scientifiques les plus sériuses et les plus récentes. Vous n'inventez jamais rien. Vous êtes extrêmement précis et rigoureux."
+            }]
           })
         });
-
+    
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
         }
-
+    
         const data = await response.json();
-        console.log('Réponse API:', data);
-
-        if (data.content && data.content[0] && data.content[0].text) {
-          const diagnosis = data.content[0].text;
-          diagnosisResult.textContent = diagnosis;
-          treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
-        } else {
-          throw new Error('Format de réponse invalide');
-        }
+        console.log('Réponse API:', data);  // Pour le débogage
+    
+        // Vérification plus souple du format de réponse
+        const diagnosis = data.content?.[0]?.text || "Pas de diagnostic disponible";
+        diagnosisResult.textContent = diagnosis;
+        treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
+        
       } catch (error) {
         console.error('Erreur complète:', error);
         diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
       }
     }
-
     // Sauvegarde des fichiers
     function saveFiles() {
       alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
