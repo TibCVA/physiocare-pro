@@ -251,14 +251,13 @@ En attente d'un diagnostic pour générer un plan de traitement...
         const data = await response.json();
         console.log("Réponse API complète :", data);
     
-        // Vérification stricte de la structure de la réponse
-        const content = data?.content;
-        if (!Array.isArray(content) || !content[0]?.text) {
+        // Vérification du champ content
+        if (!data?.content || typeof data.content !== "string") {
           throw new Error("Réponse de Claude mal formatée ou vide.");
         }
     
         // Extraction du texte du diagnostic
-        const diagnosisText = content[0].text.trim();
+        const diagnosisText = data.content.trim();
         if (diagnosisText.length === 0) {
           throw new Error("Le diagnostic retourné est vide.");
         }
