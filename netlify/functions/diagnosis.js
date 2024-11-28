@@ -33,7 +33,7 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022', // Corrected model
-        max_tokens: 10000, // You can adjust this as needed
+        max_tokens: 7000, // You can adjust this as needed
         messages: [
           {
             role: 'user',
