@@ -5,25 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PhysioCare Pro</title>
   <style>
-    /* Design modernisé et professionnel */
+    /* Palette de couleurs et design modernisé */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #f4f4f9, #e8f5e9);
-      color: #333;
+      background: linear-gradient(to bottom, #f0f8ff, #e3f2fd);
+      color: #2c3e50;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
     }
 
     header {
-      background-color: #4CAF50;
+      background-color: #007BFF;
       color: white;
       width: 100%;
       text-align: center;
       padding: 20px 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 10px;
     }
 
     nav {
@@ -32,34 +42,39 @@
       display: flex;
       justify-content: space-around;
       padding: 10px;
-      border-bottom: 2px solid #f0f0f0;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      border-bottom: 2px solid #e0e0e0;
+      position: fixed;
+      top: 80px;
+      z-index: 1000;
     }
 
     nav button {
       background: none;
       border: none;
-      padding: 10px;
+      padding: 10px 15px;
       font-size: 16px;
       cursor: pointer;
-      color: #4CAF50;
+      color: #007BFF;
       font-weight: bold;
+      border-radius: 20px;
+      transition: all 0.3s ease;
     }
 
     nav button.active {
-      border-bottom: 2px solid #4CAF50;
+      background-color: #007BFF;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     .container {
       max-width: 800px;
-      margin: 20px auto;
+      margin: 140px auto 20px;
       padding: 20px;
       background: white;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
+      border-radius: 15px;
       display: none;
+      animation: fadeIn 0.3s ease-in-out;
     }
 
     .container.active {
@@ -67,8 +82,8 @@
     }
 
     h2 {
-      color: #4CAF50;
-      border-bottom: 2px solid #4CAF50;
+      color: #007BFF;
+      border-bottom: 2px solid #007BFF;
       padding-bottom: 5px;
     }
 
@@ -77,25 +92,27 @@
       align-items: center;
       gap: 10px;
       width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
+      padding: 12px;
+      background-color: #007BFF;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
     button:hover {
-      background-color: #45a049;
+      background-color: #0056b3;
     }
 
     textarea, input[type="file"] {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 10px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 10px;
+      font-size: 16px;
     }
 
     .file-preview {
@@ -110,8 +127,8 @@
       height: 100px;
       object-fit: cover;
       border: 1px solid #ccc;
-      border-radius: 5px;
-      background: #e8f5e9;
+      border-radius: 10px;
+      background: #e3f2fd;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -120,31 +137,46 @@
     }
 
     .result {
-      background: #e8f5e9;
+      background: #e3f2fd;
       padding: 15px;
-      border-radius: 5px;
+      border-radius: 10px;
       margin-top: 10px;
+      font-size: 16px;
+      line-height: 1.5;
     }
 
     footer {
-      background-color: #4CAF50;
+      background-color: #007BFF;
       color: white;
       padding: 10px 0;
       text-align: center;
-      margin-top: 20px;
+      margin-top: auto;
       width: 100%;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
   <header>
+    <img src="logo-path.png" alt="PhysioCare Logo">
     <h1>PhysioCare Pro</h1>
   </header>
 
   <nav>
     <button class="active" onclick="showStep(1)">Données Patient</button>
     <button onclick="showStep(2)">Diagnostic</button>
-    <button onclick="showStep(3); generateTreatmentPlan();">Plan de Traitement</button>
+    <button onclick="showStep(3)">Plan de Traitement</button>
   </nav>
 
   <!-- Étape 1 : Données / Informations Patient -->
@@ -179,161 +211,19 @@
   </footer>
 
   <script>
-    let generatedDiagnosis = ""; // Variable pour stocker le diagnostic
-
-    // Navigation entre les étapes
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
       const buttons = document.querySelectorAll('nav button');
-
       steps.forEach((container, index) => {
         container.classList.remove('active');
         if (index + 1 === step) container.classList.add('active');
       });
-
       buttons.forEach((button, index) => {
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
     }
 
-    // Gestion des fichiers uploadés
-    const fileInput = document.getElementById("fileInput");
-    const filePreview = document.getElementById("filePreview");
-
-    fileInput.addEventListener("change", () => {
-      filePreview.innerHTML = "";
-      const files = fileInput.files;
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-
-        if (file.type.startsWith("image/")) {
-          reader.onload = (e) => {
-            const img = document.createElement("img");
-            img.src = e.target.result;
-            filePreview.appendChild(img);
-          };
-          reader.readAsDataURL(file);
-        } else {
-          const fileDiv = document.createElement("div");
-          fileDiv.classList.add("file");
-          fileDiv.textContent = file.name;
-          filePreview.appendChild(fileDiv);
-        }
-      }
-    });
-
-    // Fonction de diagnostic
-    async function generateDiagnosis() {
-      const symptoms = document.getElementById("symptoms").value;
-      const diagnosisResult = document.getElementById("diagnosisResult");
-
-      if (!symptoms.trim()) {
-        diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes.";
-        return;
-      }
-
-      diagnosisResult.textContent = "Analyse en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            max_tokens: 1000,
-            messages: [
-              {
-                role: "user",
-                content: `Veuillez donner un diagnostic concis basé sur les symptômes suivants : "${symptoms}".`
-              }
-            ]
-          })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const diagnosis = data.content || "Pas de diagnostic disponible.";
-
-        if (diagnosis.trim().length > 0) {
-          diagnosisResult.textContent = diagnosis;
-          generatedDiagnosis = diagnosis; // Stocke le diagnostic pour le traitement
-        } else {
-          diagnosisResult.textContent = "Pas de diagnostic disponible.";
-        }
-      } catch (error) {
-        console.error("Erreur complète:", error);
-        diagnosisResult.textContent =
-          "Erreur lors de l'établissement du diagnostic : " + error.message;
-      }
-    }
-
-    // Fonction de plan de traitement
-    async function generateTreatmentPlan() {
-      const treatmentPlanResult = document.getElementById("treatmentPlan");
-    
-      if (!generatedDiagnosis.trim()) {
-        treatmentPlanResult.textContent =
-          "Veuillez d'abord établir un diagnostic avant de générer un plan de traitement.";
-        return;
-      }
-    
-      treatmentPlanResult.textContent = "Génération du plan de traitement en cours...";
-    
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            max_tokens: 1000,
-            messages: [
-              {
-                role: "user",
-                content: `Le diagnostic suivant a été établi : "${generatedDiagnosis}". 
-                À partir de ce diagnostic, veuillez proposer un plan de traitement clair, concis et adapté pour un kinésithérapeute. 
-                Les recommandations doivent inclure :
-                • Exercices spécifiques
-                • Fréquence des séances
-                • Interventions spécifiques (massage, électrothérapie, etc.)
-                Présentez les informations sous forme de points clés, en respectant la rigueur scientifique.`
-              }
-            ]
-          })
-        });
-    
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        const treatmentPlan = data.content || "Pas de plan de traitement disponible.";
-    
-        if (treatmentPlan.trim().length > 0) {
-          treatmentPlanResult.textContent = treatmentPlan;
-        } else {
-          treatmentPlanResult.textContent = "Pas de plan de traitement disponible.";
-        }
-      } catch (error) {
-        console.error("Erreur complète:", error);
-        treatmentPlanResult.textContent =
-          "Erreur lors de la génération du plan de traitement : " + error.message;
-      }
-    }
-
-
-    // Sauvegarde des fichiers
     function saveFiles() {
       alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
     }
