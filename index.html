@@ -241,19 +241,15 @@ En attente d'un diagnostic pour générer un plan de traitement...
         headers: {
           "Content-Type": "application/json",
           "anthropic-version": "2024-02-15",
-          "x-api-key": "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",
-          "origin": window.location.origin
+          "Authorization": `Bearer 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`
         },
         body: JSON.stringify({
           model: "claude-3-sonnet-20240229",
           max_tokens: 1000,
-          messages: [
-            {
-              role: "user",
-              content: symptoms
-            }
-          ],
-          system: "Vous êtes un assistant expert en kinésithérapie et n'utilisez que les connaissances issues des études scientifiques les plus sériuses et les plus récentes. Vous n'inventez jamais rien. Vous êtes extrêmement précis et rigoureux."
+          messages: [{
+            role: "user",
+            content: symptoms
+          }]
         })
       });
   
@@ -266,8 +262,8 @@ En attente d'un diagnostic pour générer un plan de traitement...
       const data = await response.json();
       console.log('Réponse API:', data);
   
-      if (data.content && data.content[0] && data.content[0].text) {
-        const diagnosis = data.content[0].text;
+      const diagnosis = data.messages?.[0]?.content || data.content?.[0]?.text;
+      if (diagnosis) {
         diagnosisResult.textContent = diagnosis;
         treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
       } else {
@@ -276,7 +272,6 @@ En attente d'un diagnostic pour générer un plan de traitement...
     } catch (error) {
       console.error('Erreur complète:', error);
       diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
-      // Afficher l'erreur dans la console pour le débogage
       console.error('Stack trace:', error.stack);
     }
   }
