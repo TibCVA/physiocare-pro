@@ -90,11 +90,6 @@
       background-color: #45a049;
     }
 
-    button img {
-      width: 20px;
-      height: 20px;
-    }
-
     textarea, input[type="file"] {
       width: 100%;
       padding: 10px;
@@ -149,7 +144,7 @@
   <nav>
     <button class="active" onclick="showStep(1)">Données Patient</button>
     <button onclick="showStep(2)">Diagnostic</button>
-    <button onclick="showStep(3)">Plan de Traitement</button>
+    <button onclick="showStep(3); generateTreatmentPlan();">Plan de Traitement</button>
   </nav>
 
   <!-- Étape 1 : Données / Informations Patient -->
@@ -174,9 +169,9 @@
   <!-- Étape 3 : Plan de Traitement -->
   <div class="container" id="step3">
     <h2>Plan de Traitement</h2>
-    <textarea id="treatmentPlan" class="result" readonly>
-En attente d'un diagnostic pour générer un plan de traitement...
-    </textarea>
+    <div id="treatmentPlan" class="result">
+      En attente d'un diagnostic pour générer un plan de traitement...
+    </div>
   </div>
 
   <footer>
@@ -184,6 +179,8 @@ En attente d'un diagnostic pour générer un plan de traitement...
   </footer>
 
   <script>
+    let generatedDiagnosis = ""; // Variable pour stocker le diagnostic
+
     // Navigation entre les étapes
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
@@ -228,70 +225,111 @@ En attente d'un diagnostic pour générer un plan de traitement...
       }
     });
 
-    // Fonction de diagnostic avec Netlify Functions
-// Fonction de diagnostic avec Netlify Functions
-async function generateDiagnosis() {
-  const symptoms = document.getElementById("symptoms").value;
-  const diagnosisResult = document.getElementById("diagnosisResult");
+    // Fonction de diagnostic
+    async function generateDiagnosis() {
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
 
-  // Vérification des symptômes
-  if (!symptoms.trim()) {
-    diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes.";
-    return;
-  }
+      if (!symptoms.trim()) {
+        diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes.";
+        return;
+      }
 
-  // Mise à jour de l'interface pendant l'analyse
-  diagnosisResult.textContent = "Analyse en cours...";
+      diagnosisResult.textContent = "Analyse en cours...";
 
-  try {
-    // Appel à la fonction Netlify
-    const response = await fetch("/.netlify/functions/diagnosis", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022", // Modèle mis à jour
-        max_tokens: 1000,
-        messages: [
-          {
-            role: "user",
-            content: symptoms
-          }
-        ]
-      })
-    });
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 1000,
+            messages: [
+              {
+                role: "user",
+                content: `Veuillez donner un diagnostic concis basé sur les symptômes suivants : "${symptoms}".`
+              }
+            ]
+          })
+        });
 
-    // Vérification de la réponse HTTP
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Erreur API:", errorData);
-      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const diagnosis = data.content || "Pas de diagnostic disponible.";
+
+        if (diagnosis.trim().length > 0) {
+          diagnosisResult.textContent = diagnosis;
+          generatedDiagnosis = diagnosis; // Stocke le diagnostic pour le traitement
+        } else {
+          diagnosisResult.textContent = "Pas de diagnostic disponible.";
+        }
+      } catch (error) {
+        console.error("Erreur complète:", error);
+        diagnosisResult.textContent =
+          "Erreur lors de l'établissement du diagnostic : " + error.message;
+      }
     }
 
-    // Extraction des données de la réponse
-    const data = await response.json();
-    console.log("Réponse API:", data); // Log pour le débogage
+    // Fonction de plan de traitement
+    async function generateTreatmentPlan() {
+      const treatmentPlanResult = document.getElementById("treatmentPlan");
 
-    // Vérification et extraction du diagnostic
-    const diagnosis = data.content || "Pas de diagnostic disponible.";
-    if (diagnosis.trim().length > 0) {
-      diagnosisResult.textContent = diagnosis; // Affichage du diagnostic
-    } else {
-      diagnosisResult.textContent = "Pas de diagnostic disponible.";
+      if (!generatedDiagnosis.trim()) {
+        treatmentPlanResult.textContent =
+          "Veuillez d'abord établir un diagnostic avant de générer un plan de traitement.";
+        return;
+      }
+
+      treatmentPlanResult.textContent = "Génération du plan de traitement en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 1000,
+            messages: [
+              {
+                role: "user",
+                content: `Sur la base du diagnostic suivant : "${generatedDiagnosis}", veuillez proposer un plan de traitement précis, concis et rigoureux en points clés.`
+              }
+            ]
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const treatmentPlan = data.content || "Pas de plan de traitement disponible.";
+
+        if (treatmentPlan.trim().length > 0) {
+          treatmentPlanResult.textContent = treatmentPlan;
+        } else {
+          treatmentPlanResult.textContent = "Pas de plan de traitement disponible.";
+        }
+      } catch (error) {
+        console.error("Erreur complète:", error);
+        treatmentPlanResult.textContent =
+          "Erreur lors de la génération du plan de traitement : " + error.message;
+      }
     }
-  } catch (error) {
-    // Gestion des erreurs
-    console.error("Erreur complète:", error);
-    diagnosisResult.textContent =
-      "Erreur lors de l'établissement du diagnostic : " + error.message;
-  }
-}
 
-// Sauvegarde des fichiers
-function saveFiles() {
-  alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
-}
+    // Sauvegarde des fichiers
+    function saveFiles() {
+      alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
+    }
   </script>
 </body>
 </html>
