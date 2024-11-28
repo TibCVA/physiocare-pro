@@ -1,84 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <style>
-    /* Styles identiques à la version précédente */
+    /* Importation des polices */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap');
+
+    /* Variables CSS pour les couleurs */
+    :root {
+      --primary-color: #0066cc;
+      --secondary-color: #004999;
+      --accent-color: #0099ff;
+      --background-color: #f0f8ff;
+      --text-color: #333;
+      --light-gray: #f7f7f7;
+      --error-color: #ff4d4d;
+    }
+
+    /* Styles globaux */
     body {
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #f5faff, #d6ebff);
-      color: #333;
+      background: var(--background-color);
+      color: var(--text-color);
       display: flex;
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
     }
 
+    /* Style du header */
     header {
-      background-color: #0056b3;
+      background-color: var(--primary-color);
       color: white;
       width: 100%;
       text-align: center;
-      padding: 20px 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      border-bottom: 4px solid #003d80;
+      padding: 15px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     header img {
-      width: 70px;
-      margin-bottom: 10px;
+      width: 60px;
+      margin-bottom: 5px;
       border-radius: 50%;
       border: 2px solid white;
     }
 
     header h1 {
-      font-size: 24px;
+      font-size: 22px;
       margin: 0;
+      font-weight: 700;
     }
 
+    /* Style de la navigation */
     nav {
-      background-color: #007bff;
+      background-color: var(--accent-color);
       width: 100%;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
       position: sticky;
-      top: 0;
-      z-index: 10;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      top: 72px;
+      z-index: 999;
     }
 
     nav button {
       background: none;
       border: none;
-      padding: 10px 15px;
+      padding: 10px 20px;
       font-size: 14px;
       cursor: pointer;
       color: white;
-      font-weight: bold;
-      border-radius: 20px;
-      text-align: center;
+      font-weight: 500;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
       transition: background-color 0.3s ease;
     }
 
-    nav button.active {
-      background-color: white;
-      color: #007bff;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    nav button.active, nav button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
     }
 
+    nav button span {
+      margin-left: 8px;
+    }
+
+    /* Style des conteneurs */
     .container {
-      max-width: 90%;
-      margin: 20px auto;
+      max-width: 100%;
+      width: 90%;
+      margin: 20px auto 80px auto;
       padding: 20px;
       background: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 15px;
       display: none;
       animation: fadeIn 0.5s ease-in-out;
     }
@@ -88,45 +111,63 @@
     }
 
     h2 {
-      color: #0056b3;
-      border-bottom: 2px solid #0056b3;
-      padding-bottom: 5px;
-      margin-bottom: 15px;
+      color: var(--primary-color);
+      border-left: 5px solid var(--primary-color);
+      padding-left: 10px;
+      margin-bottom: 20px;
+      font-weight: 700;
     }
 
-    button {
-      width: 100%;
-      padding: 15px;
-      background-color: #0056b3;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s ease;
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
     }
 
-    button:hover {
-      background-color: #003d80;
-    }
-
+    /* Style des inputs */
     textarea, select, input[type="file"] {
       width: 100%;
-      padding: 15px;
-      margin-top: 10px;
+      padding: 12px;
+      margin-top: 5px;
       border: 1px solid #ccc;
-      border-radius: 10px;
+      border-radius: 8px;
       box-sizing: border-box;
       font-size: 14px;
+      background-color: var(--light-gray);
+      transition: border-color 0.3s ease;
+    }
+
+    textarea:focus, select:focus, input[type="file"]:focus {
+      border-color: var(--accent-color);
+      outline: none;
     }
 
     textarea::placeholder, select::placeholder {
       color: #999;
     }
 
+    /* Style des boutons */
+    button.primary-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    button.primary-btn:hover {
+      background-color: var(--secondary-color);
+    }
+
+    /* Style des résultats */
     .result {
-      background: #e9f4ff;
+      background: var(--light-gray);
       padding: 15px;
       border-radius: 10px;
       margin-top: 20px;
@@ -135,16 +176,19 @@
       font-family: 'Roboto Mono', monospace;
     }
 
+    /* Style du footer */
     footer {
-      background-color: #0056b3;
+      background-color: var(--primary-color);
       color: white;
       padding: 10px 0;
       text-align: center;
-      margin-top: 20px;
       width: 100%;
-      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      bottom: 0;
+      font-size: 14px;
     }
 
+    /* Animations */
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -153,6 +197,18 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav button {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      header h1 {
+        font-size: 20px;
       }
     }
   </style>
@@ -164,77 +220,87 @@
   </header>
 
   <nav>
-    <button class="active" onclick="showStep(1)">Patient Info</button>
-    <button onclick="showStep(2)">Symptoms</button>
-    <button onclick="showStep(3)">Diagnosis</button>
-    <button onclick="showStep(4)">Treatment</button>
+    <button class="active" onclick="showStep(1)">
+      <img src="icons/user.svg" alt="Infos Patient" width="20">
+      <span>Infos Patient</span>
+    </button>
+    <button onclick="showStep(2)">
+      <img src="icons/symptoms.svg" alt="Symptômes" width="20">
+      <span>Symptômes</span>
+    </button>
+    <button onclick="showStep(3)">
+      <img src="icons/diagnosis.svg" alt="Diagnostic" width="20">
+      <span>Diagnostic</span>
+    </button>
+    <button onclick="showStep(4)">
+      <img src="icons/treatment.svg" alt="Traitement" width="20">
+      <span>Traitement</span>
+    </button>
   </nav>
 
   <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
-    <h2>Patient Information</h2>
-    <label for="gender">Gender:</label>
+    <h2>Informations du Patient</h2>
+    <label for="gender">Genre :</label>
     <select id="gender">
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
+      <option value="Homme">Homme</option>
+      <option value="Femme">Femme</option>
+      <option value="Autre">Autre</option>
     </select>
-    <label for="age">Age:</label>
+
+    <label for="age">Âge :</label>
     <select id="age">
       <option value="18-30">18-30</option>
       <option value="31-50">31-50</option>
       <option value="51-70">51-70</option>
       <option value="71+">71+</option>
     </select>
-    <label for="weight">Weight (kg):</label>
-    <select id="weight">
-      <option value="50-60">50-60</option>
-      <option value="61-70">61-70</option>
-      <option value="71-80">71-80</option>
-      <option value="81+">81+</option>
-    </select>
-    <label for="height">Height (cm):</label>
-    <select id="height">
-      <option value="150-160">150-160</option>
-      <option value="161-170">161-170</option>
-      <option value="171-180">171-180</option>
-      <option value="181+">181+</option>
-    </select>
-    <label for="sport">Sports Activity:</label>
+
+    <label for="weight">Poids (kg) :</label>
+    <input type="number" id="weight" placeholder="Exemple : 70">
+
+    <label for="height">Taille (cm) :</label>
+    <input type="number" id="height" placeholder="Exemple : 175">
+
+    <label for="sport">Activité Sportive :</label>
     <select id="sport">
-      <option value="None">None</option>
-      <option value="Occasional">Occasional</option>
-      <option value="Regular">Regular</option>
-      <option value="Professional">Professional</option>
+      <option value="Aucune">Aucune</option>
+      <option value="Occasionnelle">Occasionnelle</option>
+      <option value="Régulière">Régulière</option>
+      <option value="Professionnelle">Professionnelle</option>
     </select>
-    <label for="conditions">Specific Medical Conditions:</label>
-    <textarea id="conditions" placeholder="Example: Diabetes, hypertension, etc."></textarea>
+
+    <label for="conditions">Conditions Médicales Spécifiques :</label>
+    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
   </div>
 
   <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
-    <h2>Symptoms and Medical Analysis</h2>
-    <textarea id="symptoms" placeholder="Example: Back pain, muscle weakness..."></textarea>
-    <h3>Upload Analysis Files (PDF or Images)</h3>
+    <h2>Symptômes et Analyses Médicales</h2>
+    <label for="symptoms">Symptômes :</label>
+    <textarea id="symptoms" placeholder="Exemple : Douleur au dos, faiblesse musculaire..."></textarea>
+
+    <label for="fileInput">Télécharger des fichiers d'analyse (PDF ou Images) :</label>
     <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
   </div>
 
   <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
-    <h2>Diagnosis</h2>
-    <button onclick="generateDiagnosis()">Get Diagnosis</button>
-    <div id="diagnosisResult" class="result">Diagnosis result: Awaiting...</div>
+    <h2>Diagnostic</h2>
+    <button class="primary-btn" onclick="generateDiagnosis()">Obtenir le Diagnostic</button>
+    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
   </div>
 
   <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
-    <h2>Treatment Plan</h2>
+    <h2>Plan de Traitement</h2>
     <div id="treatmentPlan" class="result">
-      Awaiting diagnosis to generate treatment plan...
+      En attente du diagnostic pour générer le plan de traitement...
     </div>
   </div>
 
   <footer>
-    © 2024 PhysioCare Pro - Your Intelligent Physiotherapy Assistant
+    © 2024 PhysioCare Pro - Votre Assistant Kinésithérapeute Intelligent
   </footer>
 
   <script>
@@ -307,7 +373,7 @@
               {
                 role: "user",
                 content: `
-Patient: 
+Patient:
 - Genre: ${gender}
 - Âge: ${age}
 - Poids: ${weight}
@@ -318,7 +384,7 @@ Patient:
 
 Diagnostic: ${diagnosis}
 
-Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinesithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
               },
             ],
           }),
