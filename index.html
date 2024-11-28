@@ -4,19 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
+  <!-- Importation des polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Importation de Font Awesome pour les icônes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* Importation des polices */
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap');
-
     /* Variables CSS pour les couleurs */
     :root {
-      --primary-color: #007bff;
-      --secondary-color: #0056b3;
-      --accent-color: #0099ff;
-      --background-color: #f8f9fa;
-      --text-color: #343a40;
-      --light-gray: #e9ecef;
+      --primary-color: #0052cc;
+      --secondary-color: #003d99;
+      --accent-color: #0073e6;
+      --background-color: #f0f4f8;
+      --text-color: #333;
+      --light-gray: #fafafa;
       --error-color: #ff4d4d;
     }
 
@@ -54,7 +55,7 @@
     }
 
     header h1 {
-      font-size: 22px;
+      font-size: 24px;
       margin: 0;
       font-weight: 700;
     }
@@ -74,7 +75,7 @@
     nav button {
       background: none;
       border: none;
-      padding: 10px 20px;
+      padding: 10px 15px;
       font-size: 14px;
       cursor: pointer;
       color: white;
@@ -85,12 +86,13 @@
       transition: background-color 0.3s ease;
     }
 
-    nav button.active, nav button:hover {
+    nav button.active {
       background-color: rgba(255, 255, 255, 0.2);
     }
 
-    nav button span {
-      margin-left: 8px;
+    nav button i {
+      margin-right: 8px;
+      font-size: 18px;
     }
 
     /* Style des conteneurs */
@@ -125,7 +127,7 @@
     }
 
     /* Style des inputs */
-    textarea, select, input[type="file"] {
+    textarea, select, input[type="file"], input[type="number"] {
       width: 100%;
       padding: 12px;
       margin-top: 5px;
@@ -137,12 +139,12 @@
       transition: border-color 0.3s ease;
     }
 
-    textarea:focus, select:focus, input[type="file"]:focus {
+    textarea:focus, select:focus, input[type="file"]:focus, input[type="number"]:focus {
       border-color: var(--accent-color);
       outline: none;
     }
 
-    textarea::placeholder, select::placeholder {
+    textarea::placeholder, select::placeholder, input::placeholder {
       color: #999;
     }
 
@@ -203,12 +205,12 @@
     /* Responsive */
     @media (max-width: 768px) {
       nav button {
-        padding: 8px 12px;
+        padding: 8px 10px;
         font-size: 12px;
       }
 
       header h1 {
-        font-size: 20px;
+        font-size: 22px;
       }
     }
   </style>
@@ -221,19 +223,19 @@
 
   <nav>
     <button class="active" onclick="showStep(1)">
-      <img src="icons/user.svg" alt="Infos Patient" width="20">
+      <i class="fas fa-user"></i>
       <span>Infos Patient</span>
     </button>
     <button onclick="showStep(2)">
-      <img src="icons/symptoms.svg" alt="Symptômes" width="20">
+      <i class="fas fa-notes-medical"></i>
       <span>Symptômes</span>
     </button>
     <button onclick="showStep(3)">
-      <img src="icons/diagnosis.svg" alt="Diagnostic" width="20">
+      <i class="fas fa-diagnoses"></i>
       <span>Diagnostic</span>
     </button>
     <button onclick="showStep(4)">
-      <img src="icons/treatment.svg" alt="Traitement" width="20">
+      <i class="fas fa-stethoscope"></i>
       <span>Traitement</span>
     </button>
   </nav>
@@ -337,6 +339,7 @@
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
             messages: [
               {
                 role: "user",
@@ -369,6 +372,7 @@
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
             messages: [
               {
                 role: "user",
