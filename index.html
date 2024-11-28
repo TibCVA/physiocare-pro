@@ -137,6 +137,7 @@
       padding: 10px 0;
       text-align: center;
       margin-top: 20px;
+      width: 100%;
     }
   </style>
 </head>
@@ -227,61 +228,57 @@ En attente d'un diagnostic pour générer un plan de traitement...
       }
     });
 
-    // Fonction de diagnostic
-   async function generateDiagnosis() {
-    const symptoms = document.getElementById("symptoms").value;
-    const diagnosisResult = document.getElementById("diagnosisResult");
-    const treatmentPlan = document.getElementById("treatmentPlan");
-  
-    diagnosisResult.textContent = "Analyse en cours...";
-  
-    const apiUrl = "https://api.anthropic.com/v1/messages";
-    const apiData = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "anthropic-version": "2024-02-15",
-        "x-api-key": "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"
-      },
-      body: JSON.stringify({
-        model: "claude-3-sonnet-20240229",
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: symptoms
-        }]
-      })
-    };
-  
-    // Encodage des données pour AllOrigins
-    const encodedApiData = encodeURIComponent(JSON.stringify(apiData));
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}&method=POST&data=${encodedApiData}`;
-  
-    try {
-      const response = await fetch(proxyUrl);
-  
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Response:', errorData);
-        throw new Error(`Erreur HTTP: ${response.status}`);
+    // Fonction de diagnostic avec Netlify Functions
+    async function generateDiagnosis() {
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+      const treatmentPlan = document.getElementById("treatmentPlan");
+
+      if (!symptoms.trim()) {
+        diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes";
+        return;
       }
-  
-      const data = await response.json();
-      console.log('Réponse API:', data);
-  
-      const diagnosis = data.content;
-      if (diagnosis) {
-        diagnosisResult.textContent = diagnosis;
-        treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
-      } else {
-        throw new Error('Format de réponse invalide');
+
+      diagnosisResult.textContent = "Analyse en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "claude-3-sonnet-20240229",
+            max_tokens: 1000,
+            messages: [{
+              role: "user",
+              content: symptoms
+            }],
+            system: "Vous êtes un assistant expert en kinésithérapie et n'utilisez que les connaissances issues des études scientifiques les plus sériuses et les plus récentes. Vous n'inventez jamais rien. Vous êtes extrêmement précis et rigoureux."
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Réponse API:', data);
+
+        if (data.content && data.content[0] && data.content[0].text) {
+          const diagnosis = data.content[0].text;
+          diagnosisResult.textContent = diagnosis;
+          treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
+        } else {
+          throw new Error('Format de réponse invalide');
+        }
+      } catch (error) {
+        console.error('Erreur complète:', error);
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
       }
-    } catch (error) {
-      console.error('Erreur complète:', error);
-      diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
-      console.error('Stack trace:', error.stack);
     }
-  }
+
     // Sauvegarde des fichiers
     function saveFiles() {
       alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
