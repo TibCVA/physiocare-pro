@@ -2,70 +2,88 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return { 
-      statusCode: 405, 
-      body: JSON.stringify({ error: 'Method Not Allowed' }) 
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Méthode non autorisée. Utilisez POST.' })
     };
   }
 
   try {
     const requestData = JSON.parse(event.body);
-    
+
+    // Validation des données d'entrée
+    if (
+      !requestData.model ||
+      !requestData.messages ||
+      !Array.isArray(requestData.messages) ||
+      !requestData.messages[0]?.content
+    ) {
+      throw new Error(
+        'Données d’entrée invalides. Assurez-vous de fournir un modèle et un message valide.'
+      );
+    }
+
+    // Appel à l'API Claude
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2024-02-15',
-        'x-api-key': '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'
+        'anthropic-version': '2023-06-01', // Corrected version
+        'x-api-key': process.env.ANTHROPIC_API_KEY // Ensure the key is loaded from env variables
       },
       body: JSON.stringify({
-        model: requestData.model,
-        messages: [{
-          role: "user",
-          content: requestData.messages[0].content
-        }]
+        model: 'claude-3-5-sonnet-20241022', // Corrected model
+        max_tokens: 10000, // You can adjust this as needed
+        messages: [
+          {
+            role: 'user',
+            content: requestData.messages[0].content
+          }
+        ]
       })
     });
 
     if (!claudeResponse.ok) {
-      throw new Error(`Claude API error: ${claudeResponse.status}`);
-    }
-
-    const claudeData = await claudeResponse.json();
-    console.log('Claude Response:', claudeData);
-
-    // Vérification de la structure de la réponse
-    if (!claudeResponse.ok) {
-      const errorText = await claudeResponse.text(); // Lire le corps de la réponse
-      console.error(`Erreur Claude API: ${errorText}`); // Logger les détails de l'erreur
+      const errorText = await claudeResponse.text(); // Log the full error response
+      console.error(`Erreur Claude API: ${errorText}`);
       throw new Error(`Claude API error: ${claudeResponse.statusText}`);
     }
 
+    const claudeData = await claudeResponse.json();
+    console.log('Claude API Réponse:', claudeData);
+
+    // Validation de la réponse de Claude
+    if (!claudeData.completion) {
+      throw new Error('Réponse de Claude invalide ou vide.');
+    }
+
+    // Réponse réussie
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*' // Adjust as needed for CORS
       },
       body: JSON.stringify({
-        content: [{
-          text: claudeData.content[0].text
-        }]
+        content: claudeData.completion
       })
     };
   } catch (error) {
-    console.error('Function Error:', error);
+    console.error('Erreur complète:', error);
+
     return {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*' // Adjust as needed for CORS
       },
-      body: JSON.stringify({ 
-        error: error.message,
-        content: [{
-          text: "Une erreur est survenue lors du traitement de la requête."
-        }]
+      body: JSON.stringify({
+        error: error.message || 'Erreur serveur interne.',
+        content: [
+          {
+            text: "Une erreur est survenue lors du traitement de la requête."
+          }
+        ]
       })
     };
   }
