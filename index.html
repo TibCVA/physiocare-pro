@@ -236,12 +236,13 @@ En attente d'un diagnostic pour générer un plan de traitement...
     diagnosisResult.textContent = "Analyse en cours...";
   
     try {
-      const response = await fetch("https://api.bypasser.win/https://api.anthropic.com/v1/messages", {
+      const response = await fetch("https://cors-proxy.fringe.zone/https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "anthropic-version": "2024-02-15",
-          "x-api-key": "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"
+          "x-api-key": "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",
+          "origin": window.location.origin
         },
         body: JSON.stringify({
           model: "claude-3-sonnet-20240229",
@@ -257,17 +258,26 @@ En attente d'un diagnostic pour générer un plan de traitement...
       });
   
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Response:', errorData);
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
   
       const data = await response.json();
-      const diagnosis = data.content[0].text;
-      
-      diagnosisResult.textContent = diagnosis;
-      treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
+      console.log('Réponse API:', data);
+  
+      if (data.content && data.content[0] && data.content[0].text) {
+        const diagnosis = data.content[0].text;
+        diagnosisResult.textContent = diagnosis;
+        treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
+      } else {
+        throw new Error('Format de réponse invalide');
+      }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur complète:', error);
       diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
+      // Afficher l'erreur dans la console pour le débogage
+      console.error('Stack trace:', error.stack);
     }
   }
     // Sauvegarde des fichiers
