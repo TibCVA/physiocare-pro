@@ -52,9 +52,9 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse:', claudeData);
 
-    // Extract the diagnosis text correctly
-    const diagnosis = claudeData.content?.[0]?.text;
-    if (!diagnosis) {
+    // Correct extraction of the diagnostic content
+    const diagnosis = claudeData.content?.[0]?.text; // Extract the first text block
+    if (!diagnosis || diagnosis.trim().length === 0) {
       throw new Error('Réponse de Claude invalide ou vide.');
     }
 
