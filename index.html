@@ -4,97 +4,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
-  <!-- Importation des polices -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Importation des polices Apple San Francisco -->
+  <style>
+    @font-face {
+      font-family: 'SF Pro';
+      src: url('fonts/SF-Pro-Display-Regular.otf') format('opentype');
+    }
+    @font-face {
+      font-family: 'SF Pro Bold';
+      src: url('fonts/SF-Pro-Display-Bold.otf') format('opentype');
+    }
+  </style>
   <!-- Importation de Font Awesome pour les icônes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Importation de Tesseract.js pour l'OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <!-- Importation de PDF.js pour l'analyse des PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <style>
     /* Variables CSS pour les couleurs */
     :root {
-      --primary-color: #0052cc;
-      --secondary-color: #003d99;
-      --accent-color: #0073e6;
-      --background-color: #f0f4f8;
-      --text-color: #333;
-      --light-gray: #fafafa;
-      --error-color: #ff4d4d;
-    }
-
-    /* Mode sombre */
-    body.dark-mode {
-      --primary-color: #1f1f1f;
-      --background-color: #121212;
-      --text-color: #f5f5f5;
-      --light-gray: #333;
+      --primary-color: #0A84FF;
+      --background-color: #FFFFFF;
+      --text-color: #000000;
+      --light-gray: #F2F2F7;
+      --error-color: #FF3B30;
     }
 
     /* Styles globaux */
     body {
-      font-family: 'Roboto', Arial, sans-serif;
+      font-family: 'SF Pro', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: var(--background-color);
+      background-color: var(--background-color);
       color: var(--text-color);
       display: flex;
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
-      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* Style du header */
     header {
-      background-color: var(--primary-color);
-      color: white;
+      background-color: var(--background-color);
+      color: var(--text-color);
       width: 100%;
       text-align: center;
-      padding: 15px 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px 0;
+      border-bottom: 1px solid #E5E5EA;
       position: sticky;
       top: 0;
       z-index: 1000;
     }
 
     header img {
-      width: 60px;
+      width: 50px;
       margin-bottom: 5px;
-      border-radius: 50%;
-      border: 2px solid white;
     }
 
     header h1 {
-      font-size: 24px;
+      font-size: 22px;
       margin: 0;
       font-weight: 700;
-    }
-
-    /* Bouton pour basculer le thème */
-    #theme-toggle {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-    #theme-toggle:hover {
-      transform: scale(1.2);
+      font-family: 'SF Pro Bold';
     }
 
     /* Style de la navigation */
     nav {
-      background-color: var(--accent-color);
+      background-color: var(--background-color);
       width: 100%;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
-      position: sticky;
-      top: 72px;
-      z-index: 999;
+      border-bottom: 1px solid #E5E5EA;
     }
 
     nav button {
@@ -103,16 +85,16 @@
       padding: 10px 15px;
       font-size: 14px;
       cursor: pointer;
-      color: white;
+      color: var(--text-color);
       font-weight: 500;
-      border-radius: 30px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       transition: background-color 0.3s ease;
     }
 
     nav button.active {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: #E5E5EA;
     }
 
     nav button i {
@@ -126,25 +108,21 @@
       width: 90%;
       margin: 20px auto;
       padding: 20px;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      background: var(--background-color);
       border-radius: 15px;
       display: none;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+      animation: fadeIn 0.5s ease-in-out;
     }
 
     .container.active {
       display: block;
-      opacity: 1;
     }
 
     h2 {
-      color: var(--primary-color);
-      border-left: 5px solid var(--primary-color);
-      padding-left: 10px;
+      color: var(--text-color);
       margin-bottom: 20px;
       font-weight: 700;
+      font-family: 'SF Pro Bold';
     }
 
     label {
@@ -158,21 +136,22 @@
       width: 100%;
       padding: 12px;
       margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      border: 1px solid #CED0CE;
+      border-radius: 10px;
       box-sizing: border-box;
-      font-size: 14px;
+      font-size: 16px;
       background-color: var(--light-gray);
       transition: border-color 0.3s ease;
+      font-family: 'SF Pro';
     }
 
     textarea:focus, select:focus, input[type="file"]:focus, input[type="number"]:focus {
-      border-color: var(--accent-color);
+      border-color: var(--primary-color);
       outline: none;
     }
 
     textarea::placeholder, select::placeholder, input::placeholder {
-      color: #999;
+      color: #8E8E93;
     }
 
     /* Style des boutons */
@@ -182,71 +161,41 @@
       background-color: var(--primary-color);
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 17px;
       cursor: pointer;
       margin-top: 20px;
-      font-weight: 500;
+      font-weight: 600;
       transition: background-color 0.3s ease;
-      animation: pulse 2s infinite;
+      font-family: 'SF Pro';
     }
 
     button.primary-btn:hover {
-      background-color: var(--secondary-color);
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.05);
-      }
+      background-color: #0066CC;
     }
 
     /* Style des résultats */
     .result {
-      background: #e3f2fd;
-      padding: 25px;
-      border-radius: 15px;
-      margin-top: 30px;
+      background: var(--light-gray);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
       white-space: pre-wrap;
       font-size: 16px;
-      font-family: 'Roboto Mono', monospace;
-      border: 1px solid var(--primary-color);
-    }
-
-    .result ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .result ul li {
-      margin-bottom: 10px;
-      padding: 10px;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .result ul li::before {
-      content: "\f00c";
-      font-family: 'Font Awesome 5 Free';
-      font-weight: 900;
-      color: var(--primary-color);
-      margin-right: 10px;
+      font-family: 'SF Pro';
     }
 
     /* Style du footer */
     footer {
-      background-color: var(--primary-color);
-      color: white;
+      background-color: var(--background-color);
+      color: #8E8E93;
       padding: 10px 0;
       text-align: center;
       width: 100%;
+      font-size: 14px;
+      border-top: 1px solid #E5E5EA;
       position: fixed;
       bottom: 0;
-      font-size: 14px;
     }
 
     /* Animations */
@@ -269,7 +218,7 @@
       }
 
       header h1 {
-        font-size: 22px;
+        font-size: 20px;
       }
     }
   </style>
@@ -278,7 +227,6 @@
   <header>
     <img src="logo.png" alt="Logo PhysioCare">
     <h1>PhysioCare Pro</h1>
-    <button id="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
   </header>
 
   <nav>
@@ -311,20 +259,13 @@
     </select>
 
     <label for="age">Âge :</label>
-    <select id="age">
-      <option value="18-30">18-30</option>
-      <option value="31-50">31-50</option>
-      <option value="51-70">51-70</option>
-      <option value="71+">71+</option>
-    </select>
+    <input type="number" id="age" placeholder="Exemple : 45">
 
     <label for="weight">Poids (kg) :</label>
     <input type="number" id="weight" placeholder="Exemple : 70">
-    <span class="error-message"></span>
 
     <label for="height">Taille (cm) :</label>
     <input type="number" id="height" placeholder="Exemple : 175">
-    <span class="error-message"></span>
 
     <label for="sport">Activité Sportive :</label>
     <select id="sport">
@@ -333,9 +274,6 @@
       <option value="Régulière">Régulière</option>
       <option value="Professionnelle">Professionnelle</option>
     </select>
-    <span class="tooltip">i
-      <span class="tooltiptext">Une activité sportive professionnelle implique un entraînement régulier, intense et compétitif.</span>
-    </span>
 
     <label for="conditions">Conditions Médicales Spécifiques :</label>
     <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
@@ -387,14 +325,64 @@
       });
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-    }
-
     function confirmGenerateDiagnosis() {
       if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
         generateDiagnosis();
       }
+    }
+
+    async function extractTextFromFiles(files) {
+      let extractedText = '';
+      for (const file of files) {
+        if (file.type === 'application/pdf') {
+          extractedText += await extractTextFromPDF(file);
+        } else if (file.type.startsWith('image/')) {
+          extractedText += await extractTextFromImage(file);
+        }
+      }
+      return extractedText;
+    }
+
+    function extractTextFromPDF(file) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.onload = function() {
+          const typedarray = new Uint8Array(this.result);
+          pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+            let textContent = '';
+            let pagePromises = [];
+            for (let i = 1; i <= pdf.numPages; i++) {
+              pagePromises.push(pdf.getPage(i).then(page => {
+                return page.getTextContent().then(content => {
+                  content.items.forEach(item => {
+                    textContent += item.str + ' ';
+                  });
+                });
+              }));
+            }
+            Promise.all(pagePromises).then(() => {
+              resolve(textContent);
+            });
+          });
+        };
+        fileReader.readAsArrayBuffer(file);
+      });
+    }
+
+    function extractTextFromImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          Tesseract.recognize(
+            e.target.result,
+            'fra',
+            { logger: m => console.log(m) }
+          ).then(({ data: { text } }) => {
+            resolve(text);
+          });
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     async function generateDiagnosis() {
@@ -407,9 +395,17 @@
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
       const loader = document.getElementById("loader");
+      const files = document.getElementById("fileInput").files;
 
       diagnosisResult.textContent = "";
       loader.style.display = "block";
+
+      let filesContent = '';
+      if (files.length > 0) {
+        filesContent = await extractTextFromFiles(files);
+      }
+
+      const combinedSymptoms = symptoms + '\n' + filesContent;
 
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
@@ -423,7 +419,7 @@
             messages: [
               {
                 role: "user",
-                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes et analyses : ${combinedSymptoms}.`,
               },
             ],
           }),
@@ -431,15 +427,20 @@
 
         const data = await response.json();
         const diagnosisText = data.content.trim();
-        diagnosisResult.textContent = diagnosisText;
+        diagnosisResult.innerHTML = formatDiagnosis(diagnosisText);
 
-        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, combinedSymptoms, diagnosisText);
       } catch (error) {
         diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
         console.error("Erreur API:", error);
       } finally {
         loader.style.display = "none";
       }
+    }
+
+    function formatDiagnosis(text) {
+      // Formatage du diagnostic pour une meilleure lisibilité
+      return text.replace(/\n/g, '<br>');
     }
 
     async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
@@ -466,22 +467,28 @@ Patient:
 - Taille: ${height}
 - Sport: ${sport}
 - Conditions médicales spécifiques: ${conditions}
-- Symptômes: ${symptoms}
+- Symptômes et analyses: ${symptoms}
 
 Diagnostic: ${diagnosis}
 
-Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes, et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. **Structurez la réponse avec des titres, des sous-titres et des listes à puces**, et fournissez des recommandations deux fois plus détaillées qu'auparavant pour les soins, exercices ou traitements.
+`,
               },
             ],
           }),
         });
 
         const data = await response.json();
-        treatmentPlan.textContent = data.content.trim();
+        treatmentPlan.innerHTML = formatTreatmentPlan(data.content.trim());
       } catch (error) {
         treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
         console.error("Erreur complète :", error);
       }
+    }
+
+    function formatTreatmentPlan(text) {
+      // Formatage du plan de traitement pour une meilleure lisibilité
+      return text.replace(/\n/g, '<br>');
     }
   </script>
 </body>
