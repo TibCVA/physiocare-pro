@@ -279,15 +279,15 @@
     // Fonction de plan de traitement
     async function generateTreatmentPlan() {
       const treatmentPlanResult = document.getElementById("treatmentPlan");
-
+    
       if (!generatedDiagnosis.trim()) {
         treatmentPlanResult.textContent =
           "Veuillez d'abord établir un diagnostic avant de générer un plan de traitement.";
         return;
       }
-
+    
       treatmentPlanResult.textContent = "Génération du plan de traitement en cours...";
-
+    
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
@@ -300,20 +300,26 @@
             messages: [
               {
                 role: "user",
-                content: `Sur la base du diagnostic suivant : "${generatedDiagnosis}", veuillez proposer un plan de traitement précis, concis et rigoureux en points clés.`
+                content: `Le diagnostic suivant a été établi : "${generatedDiagnosis}". 
+                À partir de ce diagnostic, veuillez proposer un plan de traitement clair, concis et adapté pour un kinésithérapeute. 
+                Les recommandations doivent inclure :
+                • Exercices spécifiques
+                • Fréquence des séances
+                • Interventions spécifiques (massage, électrothérapie, etc.)
+                Présentez les informations sous forme de points clés, en respectant la rigueur scientifique.`
               }
             ]
           })
         });
-
+    
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
         }
-
+    
         const data = await response.json();
         const treatmentPlan = data.content || "Pas de plan de traitement disponible.";
-
+    
         if (treatmentPlan.trim().length > 0) {
           treatmentPlanResult.textContent = treatmentPlan;
         } else {
@@ -325,6 +331,7 @@
           "Erreur lors de la génération du plan de traitement : " + error.message;
       }
     }
+
 
     // Sauvegarde des fichiers
     function saveFiles() {
