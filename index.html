@@ -256,58 +256,58 @@ En attente d'un diagnostic pour générer un plan de traitement...
         const diagnosisText = data.content.trim();
         diagnosisResult.textContent = diagnosisText;
 
-        async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
-          const treatmentPlan = document.getElementById("treatmentPlan");
-          treatmentPlan.textContent = "Création du plan de traitement en cours...";
-        
-          try {
-            const response = await fetch("/.netlify/functions/diagnosis", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: "claude-3-5-sonnet-20241022",
-                messages: [
-                  {
-                    role: "user",
-                    content: `
-        Patient: 
-        - Genre: ${gender}
-        - Âge: ${age}
-        - Poids: ${weight}
-        - Taille: ${height}
-        - Sport: ${sport}
-        - Conditions médicales spécifiques: ${conditions}
-        - Symptômes: ${symptoms}
-        
-        Diagnostic: ${diagnosis}
-        
-        Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ne donnez pas de diagnostic. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
-                  },
-                ],
-              }),
-            });
-        
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.error("Erreur API Claude :", errorData);
-              throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-            }
-        
-            const data = await response.json();
-            const treatmentText = data.content?.trim();
-        
-            if (!treatmentText) {
-              throw new Error("Réponse vide ou mal formatée de Claude.");
-            }
-        
-            treatmentPlan.textContent = treatmentText;
-          } catch (error) {
-            treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
-            console.error("Erreur complète :", error);
+      async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
+        const treatmentPlan = document.getElementById("treatmentPlan");
+        treatmentPlan.textContent = "Création du plan de traitement en cours...";
+      
+        try {
+          const response = await fetch("/.netlify/functions/diagnosis", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "claude-3-5-sonnet-20241022",
+              messages: [
+                {
+                  role: "user",
+                  content: `
+      Patient: 
+      - Genre: ${gender}
+      - Âge: ${age}
+      - Poids: ${weight}
+      - Taille: ${height}
+      - Sport: ${sport}
+      - Conditions médicales spécifiques: ${conditions}
+      - Symptômes: ${symptoms}
+      
+      Diagnostic: ${diagnosis}
+      
+      Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ne donnez pas de diagnostic. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+                },
+              ],
+            }),
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Erreur API Claude :", errorData);
+            throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
           }
+      
+          const data = await response.json();
+          const treatmentText = data.content?.trim();
+      
+          if (!treatmentText) {
+            throw new Error("Réponse vide ou mal formatée de Claude.");
+          }
+      
+          treatmentPlan.textContent = treatmentText;
+        } catch (error) {
+          treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
+          console.error("Erreur complète :", error);
         }
+      }
   </script>
 </body>
 </html>
