@@ -6,7 +6,7 @@
   <title>PhysioCare Pro</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
       background: linear-gradient(to bottom, #f5faff, #d6ebff);
@@ -18,47 +18,57 @@
     }
 
     header {
-      background-color: #007bff;
+      background-color: #0056b3;
       color: white;
       width: 100%;
       text-align: center;
       padding: 20px 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-bottom: 4px solid #003d80;
     }
 
     header img {
-      width: 80px;
+      width: 70px;
       margin-bottom: 10px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin: 0;
     }
 
     nav {
-      background-color: #f5faff;
+      background-color: #007bff;
       width: 100%;
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       padding: 10px 0;
-      border-bottom: 2px solid #e0e0e0;
       position: sticky;
       top: 0;
       z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     nav button {
       background: none;
       border: none;
-      padding: 10px 5px;
+      padding: 10px 15px;
       font-size: 14px;
       cursor: pointer;
-      color: #007bff;
+      color: white;
       font-weight: bold;
-      border-radius: 10px;
-      flex-grow: 1;
+      border-radius: 20px;
       text-align: center;
+      transition: background-color 0.3s ease;
     }
 
     nav button.active {
-      background-color: #007bff;
-      color: white;
+      background-color: white;
+      color: #007bff;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .container {
@@ -66,9 +76,10 @@
       margin: 20px auto;
       padding: 20px;
       background: white;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
       display: none;
+      animation: fadeIn 0.5s ease-in-out;
     }
 
     .container.active {
@@ -76,55 +87,72 @@
     }
 
     h2 {
-      color: #007bff;
-      border-bottom: 2px solid #007bff;
+      color: #0056b3;
+      border-bottom: 2px solid #0056b3;
       padding-bottom: 5px;
+      margin-bottom: 15px;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background-color: #007bff;
+      padding: 15px;
+      background-color: #0056b3;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background-color: #003d80;
     }
 
     textarea, select, input[type="file"] {
       width: 100%;
-      padding: 10px;
+      padding: 15px;
       margin-top: 10px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 10px;
       box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea::placeholder, select::placeholder {
+      color: #999;
     }
 
     .result {
-      background: #f0f8ff;
+      background: #e9f4ff;
       padding: 15px;
-      border-radius: 5px;
-      margin-top: 10px;
+      border-radius: 10px;
+      margin-top: 20px;
       white-space: pre-wrap;
+      font-size: 14px;
+      font-family: 'Roboto Mono', monospace;
     }
 
     footer {
-      background-color: #007bff;
+      background-color: #0056b3;
       color: white;
       padding: 10px 0;
       text-align: center;
       margin-top: 20px;
       width: 100%;
+      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    html, body {
-      overflow-x: hidden;
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
@@ -135,77 +163,77 @@
   </header>
 
   <nav>
-    <button class="active" onclick="showStep(1)">Informations Patient</button>
-    <button onclick="showStep(2)">Symptômes et analyses médicales</button>
-    <button onclick="showStep(3)">Diagnostic</button>
-    <button onclick="showStep(4)">Plan de Traitement</button>
+    <button class="active" onclick="showStep(1)">Patient Info</button>
+    <button onclick="showStep(2)">Symptoms</button>
+    <button onclick="showStep(3)">Diagnosis</button>
+    <button onclick="showStep(4)">Treatment</button>
   </nav>
 
   <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
-    <h2>Informations Patient</h2>
-    <label for="gender">Genre :</label>
+    <h2>Patient Information</h2>
+    <label for="gender">Gender:</label>
     <select id="gender">
-      <option value="Homme">Homme</option>
-      <option value="Femme">Femme</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
     </select>
-    <label for="age">Âge :</label>
+    <label for="age">Age:</label>
     <select id="age">
       <option value="18-30">18-30</option>
       <option value="31-50">31-50</option>
       <option value="51-70">51-70</option>
       <option value="71+">71+</option>
     </select>
-    <label for="weight">Poids (kg) :</label>
+    <label for="weight">Weight (kg):</label>
     <select id="weight">
       <option value="50-60">50-60</option>
       <option value="61-70">61-70</option>
       <option value="71-80">71-80</option>
       <option value="81+">81+</option>
     </select>
-    <label for="height">Taille (cm) :</label>
+    <label for="height">Height (cm):</label>
     <select id="height">
       <option value="150-160">150-160</option>
       <option value="161-170">161-170</option>
       <option value="171-180">171-180</option>
       <option value="181+">181+</option>
     </select>
-    <label for="sport">Pratique sportive :</label>
+    <label for="sport">Sports Activity:</label>
     <select id="sport">
-      <option value="Non">Non</option>
-      <option value="Occasionnellement">Occasionnellement</option>
-      <option value="Régulièrement">Régulièrement</option>
-      <option value="Professionnel">Professionnel</option>
+      <option value="None">None</option>
+      <option value="Occasional">Occasional</option>
+      <option value="Regular">Regular</option>
+      <option value="Professional">Professional</option>
     </select>
-    <label for="conditions">Conditions médicales spécifiques :</label>
-    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
+    <label for="conditions">Specific Medical Conditions:</label>
+    <textarea id="conditions" placeholder="Example: Diabetes, hypertension, etc."></textarea>
   </div>
 
   <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
-    <h2>Symptômes et analyses médicales</h2>
-    <textarea id="symptoms" placeholder="Exemple : Douleur lombaire, faiblesse musculaire..."></textarea>
-    <h3>Ajouter des fichiers d'analyse (PDF ou Images)</h3>
+    <h2>Symptoms and Medical Analysis</h2>
+    <textarea id="symptoms" placeholder="Example: Back pain, muscle weakness..."></textarea>
+    <h3>Upload Analysis Files (PDF or Images)</h3>
     <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
   </div>
 
   <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
-    <h2>Diagnostic</h2>
-    <button onclick="generateDiagnosis()">Obtenir un diagnostic</button>
-    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
+    <h2>Diagnosis</h2>
+    <button onclick="generateDiagnosis()">Get Diagnosis</button>
+    <div id="diagnosisResult" class="result">Diagnosis result: Awaiting...</div>
   </div>
 
   <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
-    <h2>Plan de Traitement</h2>
+    <h2>Treatment Plan</h2>
     <div id="treatmentPlan" class="result">
-      En attente d'un diagnostic pour générer un plan de traitement...
+      Awaiting diagnosis to generate treatment plan...
     </div>
   </div>
 
   <footer>
-    © 2024 PhysioCare Pro - Votre assistant intelligent en kinésithérapie
+    © 2024 PhysioCare Pro - Your Intelligent Physiotherapy Assistant
   </footer>
 
   <script>
@@ -220,98 +248,6 @@
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
-    }
-
-    async function generateDiagnosis() {
-      const gender = document.getElementById("gender").value;
-      const age = document.getElementById("age").value;
-      const weight = document.getElementById("weight").value;
-      const height = document.getElementById("height").value;
-      const sport = document.getElementById("sport").value;
-      const conditions = document.getElementById("conditions").value;
-      const symptoms = document.getElementById("symptoms").value;
-      const diagnosisResult = document.getElementById("diagnosisResult");
-
-      diagnosisResult.textContent = "Analyse en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-              {
-                role: "user",
-                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
-              },
-            ],
-          }),
-        });
-
-        const data = await response.json();
-        const diagnosisText = data.content.trim();
-        diagnosisResult.textContent = diagnosisText;
-
-        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
-      } catch {
-        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
-      }
-    }
-
-    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
-      const treatmentPlan = document.getElementById("treatmentPlan");
-      treatmentPlan.textContent = "Création du plan de traitement en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-              {
-                role: "user",
-                content: `
-Patient: 
-- Genre: ${gender}
-- Âge: ${age}
-- Poids: ${weight}
-- Taille: ${height}
-- Sport: ${sport}
-- Conditions médicales spécifiques: ${conditions}
-- Symptômes: ${symptoms}
-
-Diagnostic: ${diagnosis}
-
-Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ne donnez pas de diagnostic. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
-              },
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Erreur API Claude :", errorData);
-          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const treatmentText = data.content?.trim();
-
-        if (!treatmentText) {
-          throw new Error("Réponse vide ou mal formatée de Claude.");
-        }
-
-        treatmentPlan.textContent = treatmentText;
-      } catch (error) {
-        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
-        console.error("Erreur complète :", error);
-      }
     }
   </script>
 </body>
