@@ -213,63 +213,130 @@ En attente d'un diagnostic pour générer un plan de traitement...
       });
     }
 
-    async function generateDiagnosis() {
-      const gender = document.getElementById("gender").value;
-      const age = document.getElementById("age").value;
-      const weight = document.getElementById("weight").value;
-      const height = document.getElementById("height").value;
-      const sport = document.getElementById("sport").value;
-      const conditions = document.getElementById("conditions").value;
-      const symptoms = document.getElementById("symptoms").value;
-      const diagnosisResult = document.getElementById("diagnosisResult");
-    
-      diagnosisResult.textContent = "Analyse en cours...";
-    
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-              {
-                role: "user",
-                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
-              },
-            ],
-          }),
-        });
-    
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Erreur API :", errorData);
-          throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
-        }
-    
-        const data = await response.json();
-        console.log("Réponse API complète :", data);
-    
-        // Vérification du champ content
-        if (!data?.content || typeof data.content !== "string") {
-          throw new Error("Réponse de Claude mal formatée ou vide.");
-        }
-    
-        // Extraction du texte du diagnostic
-        const diagnosisText = data.content.trim();
-        if (diagnosisText.length === 0) {
-          throw new Error("Le diagnostic retourné est vide.");
-        }
-    
-        // Affichage du diagnostic
-        diagnosisResult.textContent = diagnosisText;
-      } catch (error) {
-        console.error("Erreur complète :", error);
-        diagnosisResult.textContent =
-          "Erreur lors de l'établissement du diagnostic. Vérifiez vos données ou réessayez.";
+    <script>
+  async function generateDiagnosis() {
+    const gender = document.getElementById("gender").value;
+    const age = document.getElementById("age").value;
+    const weight = document.getElementById("weight").value;
+    const height = document.getElementById("height").value;
+    const sport = document.getElementById("sport").value;
+    const conditions = document.getElementById("conditions").value;
+    const symptoms = document.getElementById("symptoms").value;
+    const diagnosisResult = document.getElementById("diagnosisResult");
+
+    diagnosisResult.textContent = "Analyse en cours...";
+
+    try {
+      const response = await fetch("/.netlify/functions/diagnosis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-3-5-sonnet-20241022",
+          messages: [
+            {
+              role: "user",
+              content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erreur API :", errorData);
+        throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
       }
+
+      const data = await response.json();
+      console.log("Réponse API complète :", data);
+
+      if (!data?.content || typeof data.content !== "string") {
+        throw new Error("Réponse de Claude mal formatée ou vide.");
+      }
+
+      const diagnosisText = data.content.trim();
+      if (diagnosisText.length === 0) {
+        throw new Error("Le diagnostic retourné est vide.");
+      }
+
+      diagnosisResult.textContent = diagnosisText;
+
+      // Lancer une nouvelle requête pour le plan de traitement
+      generateTreatmentPlan(
+        gender,
+        age,
+        weight,
+        height,
+        sport,
+        conditions,
+        symptoms,
+        diagnosisText
+      );
+    } catch (error) {
+      console.error("Erreur complète :", error);
+      diagnosisResult.textContent =
+        "Erreur lors de l'établissement du diagnostic. Vérifiez vos données ou réessayez.";
     }
+  }
+
+  async function generateTreatmentPlan(
+    gender,
+    age,
+    weight,
+    height,
+    sport,
+    conditions,
+    symptoms,
+    diagnosis
+  ) {
+    const treatmentPlan = document.getElementById("treatmentPlan");
+
+    treatmentPlan.textContent = "Création du plan de traitement en cours...";
+
+    try {
+      const response = await fetch("/.netlify/functions/diagnosis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-3-5-sonnet-20241022",
+          messages: [
+            {
+              role: "user",
+              content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}, Diagnostic : ${diagnosis}. Génère un plan de traitement rigoureux et précis sous forme de bullet points.`,
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erreur API pour le plan de traitement :", errorData);
+        throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
+      }
+
+      const data = await response.json();
+      console.log("Réponse API Plan de Traitement :", data);
+
+      if (!data?.content || typeof data.content !== "string") {
+        throw new Error("Réponse de Claude mal formatée ou vide pour le plan de traitement.");
+      }
+
+      const treatmentText = data.content.trim();
+      if (treatmentText.length === 0) {
+        throw new Error("Le plan de traitement retourné est vide.");
+      }
+
+      treatmentPlan.textContent = treatmentText;
+    } catch (error) {
+      console.error("Erreur complète pour le plan de traitement :", error);
+      treatmentPlan.textContent =
+        "Erreur lors de la création du plan de traitement. Vérifiez vos données ou réessayez.";
+    }
+  }
   </script>
 </body>
 </html>
