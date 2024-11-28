@@ -31,29 +31,31 @@
       margin-bottom: 10px;
     }
 
-    nav {
+   nav {
       background-color: #f5faff;
       width: 100%;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between; /* Remplace space-around par space-between */
       padding: 10px 0;
       border-bottom: 2px solid #e0e0e0;
       position: sticky;
       top: 0;
       z-index: 10;
     }
-
+    
     nav button {
       background: none;
       border: none;
-      padding: 10px 15px;
-      font-size: 16px;
+      padding: 10px 5px; /* Ajustez la largeur intérieure pour éviter l'encombrement */
+      font-size: 14px; /* Réduit légèrement la taille du texte */
       cursor: pointer;
       color: #007bff;
       font-weight: bold;
       border-radius: 10px;
-      white-space: nowrap;
+      flex-grow: 1; /* Assurez une répartition uniforme */
+      text-align: center;
     }
+
 
     nav button.active {
       background-color: #007bff;
