@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <style>
-    /* Design modernisé et professionnel */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #f4f4f9, #e8f5e9);
+      background: linear-gradient(to bottom, #f5faff, #d6ebff);
       color: #333;
       display: flex;
       flex-direction: column;
@@ -27,37 +26,43 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    nav {
-      background-color: #ffffff;
-      width: 100%;
-      display: flex;
-      overflow-x: auto;
-      white-space: nowrap;
-      scrollbar-width: none; /* Hide scrollbar in Firefox */
-      -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+    header img {
+      width: 80px;
+      margin-bottom: 10px;
     }
 
-    nav::-webkit-scrollbar {
-      display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
+    nav {
+      background-color: #f5faff;
+      width: 100%;
+      display: flex;
+      justify-content: space-between; /* Align buttons to distribute them evenly */
+      padding: 10px 0;
+      border-bottom: 2px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     nav button {
       background: none;
       border: none;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 10px 5px;
+      font-size: 14px;
       cursor: pointer;
       color: #007bff;
       font-weight: bold;
-      flex-shrink: 0;
+      border-radius: 10px;
+      flex-grow: 1; /* Equal space for each button */
+      text-align: center;
     }
 
     nav button.active {
-      border-bottom: 2px solid #007bff;
+      background-color: #007bff;
+      color: white;
     }
 
     .container {
-      max-width: 800px;
+      max-width: 90%;
       margin: 20px auto;
       padding: 20px;
       background: white;
@@ -77,9 +82,6 @@
     }
 
     button {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       width: 100%;
       padding: 10px;
       background-color: #007bff;
@@ -88,25 +90,28 @@
       border-radius: 5px;
       font-size: 16px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     button:hover {
       background-color: #0056b3;
     }
 
-    textarea, input[type="file"], select {
+    textarea, select, input[type="file"] {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      box-sizing: border-box;
     }
 
     .result {
-      background: #e8f5e9;
+      background: #f0f8ff;
       padding: 15px;
       border-radius: 5px;
       margin-top: 10px;
+      white-space: pre-wrap;
     }
 
     footer {
@@ -117,64 +122,66 @@
       margin-top: 20px;
       width: 100%;
     }
+
+    html, body {
+      overflow-x: hidden;
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="PhysioCare Pro Logo" style="width: 60px; height: 60px; display: block; margin: 0 auto;">
+    <img src="logo.png" alt="Logo PhysioCare">
     <h1>PhysioCare Pro</h1>
   </header>
 
   <nav>
-    <button class="active" onclick="showStep(1)">Informations Patient</button>
-    <button onclick="showStep(2)">Symptômes et analyses médicales</button>
+    <button class="active" onclick="showStep(1)">Infos Patient</button>
+    <button onclick="showStep(2)">Symptômes</button>
     <button onclick="showStep(3)">Diagnostic</button>
-    <button onclick="showStep(4)">Plan de Traitement</button>
+    <button onclick="showStep(4)">Traitement</button>
   </nav>
 
   <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
     <h2>Informations Patient</h2>
-    <label>Genre :</label>
+    <label for="gender">Genre :</label>
     <select id="gender">
-      <option>Homme</option>
-      <option>Femme</option>
+      <option value="Homme">Homme</option>
+      <option value="Femme">Femme</option>
     </select>
-    <label>Âge :</label>
+    <label for="age">Âge :</label>
     <select id="age">
-      <option>18-30</option>
-      <option>30-50</option>
-      <option>50-70</option>
-      <option>70+</option>
+      <option value="18-30">18-30</option>
+      <option value="31-50">31-50</option>
+      <option value="51-70">51-70</option>
+      <option value="71+">71+</option>
     </select>
-    <label>Poids (kg) :</label>
+    <label for="weight">Poids (kg) :</label>
     <select id="weight">
-      <option>50-60</option>
-      <option>60-70</option>
-      <option>70-80</option>
-      <option>80-90</option>
-      <option>90+</option>
+      <option value="50-60">50-60</option>
+      <option value="61-70">61-70</option>
+      <option value="71-80">71-80</option>
+      <option value="81+">81+</option>
     </select>
-    <label>Taille (cm) :</label>
+    <label for="height">Taille (cm) :</label>
     <select id="height">
-      <option>150-160</option>
-      <option>160-170</option>
-      <option>170-180</option>
-      <option>180-190</option>
-      <option>190+</option>
+      <option value="150-160">150-160</option>
+      <option value="161-170">161-170</option>
+      <option value="171-180">171-180</option>
+      <option value="181+">181+</option>
     </select>
-    <label>Pratique sportive :</label>
+    <label for="sport">Pratique sportive :</label>
     <select id="sport">
-      <option>Non</option>
-      <option>Occasionnellement</option>
-      <option>Oui</option>
-      <option>Professionnel</option>
+      <option value="Non">Non</option>
+      <option value="Occasionnellement">Occasionnellement</option>
+      <option value="Régulièrement">Régulièrement</option>
+      <option value="Professionnel">Professionnel</option>
     </select>
-    <label>Conditions médicales spécifiques :</label>
-    <textarea id="medicalConditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
+    <label for="conditions">Conditions médicales spécifiques :</label>
+    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
   </div>
 
-  <!-- Étape 2 : Symptômes et analyses médicales -->
+  <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
     <h2>Symptômes et analyses médicales</h2>
     <textarea id="symptoms" placeholder="Exemple : Douleur lombaire, faiblesse musculaire..."></textarea>
@@ -193,7 +200,7 @@
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
     <div id="treatmentPlan" class="result">
-      En attente d'un diagnostic pour générer un plan de traitement...
+En attente d'un diagnostic pour générer un plan de traitement...
     </div>
   </div>
 
@@ -205,22 +212,14 @@
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
       const buttons = document.querySelectorAll('nav button');
-
       steps.forEach((container, index) => {
         container.classList.remove('active');
         if (index + 1 === step) container.classList.add('active');
       });
-
       buttons.forEach((button, index) => {
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
-    }
-
-    // Fonction pour générer un diagnostic
-    async function generateDiagnosis() {
-      // Collecte des informations patient et des symptômes...
-      alert("Diagnostic fonctionnel.");
     }
   </script>
 </body>
