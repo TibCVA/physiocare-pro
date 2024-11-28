@@ -236,7 +236,7 @@ En attente d'un diagnostic pour générer un plan de traitement...
     diagnosisResult.textContent = "Analyse en cours...";
   
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("https://api.bypasser.win/https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -257,17 +257,16 @@ En attente d'un diagnostic pour générer un plan de traitement...
       });
   
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Erreur API');
+        throw new Error(`Erreur HTTP: ${response.status}`);
       }
   
       const data = await response.json();
       const diagnosis = data.content[0].text;
-  
+      
       diagnosisResult.textContent = diagnosis;
       treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
     } catch (error) {
-      console.error('Erreur détaillée:', error);
+      console.error('Erreur:', error);
       diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
     }
   }
