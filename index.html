@@ -229,56 +229,69 @@ En attente d'un diagnostic pour générer un plan de traitement...
     });
 
     // Fonction de diagnostic avec Netlify Functions
-    async function generateDiagnosis() {
-      const symptoms = document.getElementById("symptoms").value;
-      const diagnosisResult = document.getElementById("diagnosisResult");
-      const treatmentPlan = document.getElementById("treatmentPlan");
-    
-      if (!symptoms.trim()) {
-        diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes";
-        return;
-      }
-    
-      diagnosisResult.textContent = "Analyse en cours...";
-    
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "claude-3-sonnet-20240229",
-            max_tokens: 1000,
-            messages: [{
-              role: "user",
-              content: symptoms
-            }]
-          })
-        });
-    
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-        }
-    
-        const data = await response.json();
-        console.log('Réponse API:', data);  // Pour le débogage
-    
-        // Vérification plus souple du format de réponse
-        const diagnosis = data.content?.[0]?.text || "Pas de diagnostic disponible";
-        diagnosisResult.textContent = diagnosis;
-        treatmentPlan.textContent = "Plan de traitement basé sur le diagnostic :\n" + diagnosis;
-        
-      } catch (error) {
-        console.error('Erreur complète:', error);
-        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic: " + error.message;
-      }
+// Fonction de diagnostic avec Netlify Functions
+async function generateDiagnosis() {
+  const symptoms = document.getElementById("symptoms").value;
+  const diagnosisResult = document.getElementById("diagnosisResult");
+
+  // Vérification des symptômes
+  if (!symptoms.trim()) {
+    diagnosisResult.textContent = "Erreur : veuillez entrer des symptômes.";
+    return;
+  }
+
+  // Mise à jour de l'interface pendant l'analyse
+  diagnosisResult.textContent = "Analyse en cours...";
+
+  try {
+    // Appel à la fonction Netlify
+    const response = await fetch("/.netlify/functions/diagnosis", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-20241022", // Modèle mis à jour
+        max_tokens: 1000,
+        messages: [
+          {
+            role: "user",
+            content: symptoms
+          }
+        ]
+      })
+    });
+
+    // Vérification de la réponse HTTP
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Erreur API:", errorData);
+      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
     }
-    // Sauvegarde des fichiers
-    function saveFiles() {
-      alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
+
+    // Extraction des données de la réponse
+    const data = await response.json();
+    console.log("Réponse API:", data); // Log pour le débogage
+
+    // Vérification et extraction du diagnostic
+    const diagnosis = data.content || "Pas de diagnostic disponible.";
+    if (diagnosis.trim().length > 0) {
+      diagnosisResult.textContent = diagnosis; // Affichage du diagnostic
+    } else {
+      diagnosisResult.textContent = "Pas de diagnostic disponible.";
     }
+  } catch (error) {
+    // Gestion des erreurs
+    console.error("Erreur complète:", error);
+    diagnosisResult.textContent =
+      "Erreur lors de l'établissement du diagnostic : " + error.message;
+  }
+}
+
+// Sauvegarde des fichiers
+function saveFiles() {
+  alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
+}
   </script>
 </body>
 </html>
