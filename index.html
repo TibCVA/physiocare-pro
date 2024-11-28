@@ -31,9 +31,17 @@
     }
 
     header img {
-      width: 50px;
-      height: 50px;
+      width: 120px; /* Taille ajustée */
+      height: 120px;
+      border-radius: 50%; /* Pour un effet circulaire */
+      background: transparent; /* Fond transparent (par défaut, mais peut être spécifié) */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Effet d'ombre élégante */
       margin-bottom: 10px;
+    }
+
+    header img {
+      max-width: 100%;
+      height: auto; /* Préserve le ratio */
     }
 
     nav {
@@ -169,9 +177,10 @@
 </head>
 <body>
   <header>
-    <img src="logo-path.png" alt="PhysioCare Logo">
+    <img src="./logo.png" alt="PhysioCare Pro Logo" style="width: 120px; height: 120px; margin-bottom: 10px;">
     <h1>PhysioCare Pro</h1>
   </header>
+
 
   <nav>
     <button class="active" onclick="showStep(1)">Données Patient</button>
