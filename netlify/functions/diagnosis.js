@@ -16,7 +16,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2024-02-15',
-        'x-api-key': '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'
+        'x-api-key': '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'
       },
       body: JSON.stringify({
         model: requestData.model,
