@@ -28,16 +28,16 @@ exports.handler = async (event) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01', // Corrected version
-        'x-api-key': process.env.ANTHROPIC_API_KEY // Ensure the key is loaded from env variables
+        'anthropic-version': '2023-06-01',
+        'x-api-key': process.env.ANTHROPIC_API_KEY
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022', // Corrected model
-        max_tokens: 7000, // You can adjust this as needed
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1000,
         messages: [
           {
             role: 'user',
-            content: requestData.messages[0].content
+            content: `Donnez un diagnostic concis basé sur les symptômes suivants. Répondez uniquement en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements. Voici les symptômes : "${requestData.messages[0].content}".`
           }
         ]
       })
@@ -52,20 +52,21 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse:', claudeData);
 
-    // Validation de la réponse de Claude
-    if (!claudeData.completion) {
+    // Extract the diagnosis text from the response
+    const diagnosis = claudeData.content?.[0]?.text;
+    if (!diagnosis) {
       throw new Error('Réponse de Claude invalide ou vide.');
     }
 
-    // Réponse réussie
+    // Return the diagnosis
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*' // Adjust as needed for CORS
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        content: claudeData.completion
+        content: diagnosis
       })
     };
   } catch (error) {
@@ -75,7 +76,7 @@ exports.handler = async (event) => {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*' // Adjust as needed for CORS
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
         error: error.message || 'Erreur serveur interne.',
