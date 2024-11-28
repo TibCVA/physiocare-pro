@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <style>
     body {
@@ -14,6 +14,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow-x: hidden;
     }
 
     header {
@@ -51,6 +52,7 @@
       color: #007bff;
       font-weight: bold;
       border-radius: 10px;
+      white-space: nowrap;
     }
 
     nav button.active {
@@ -100,6 +102,7 @@
       margin-top: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      box-sizing: border-box;
     }
 
     .result {
@@ -107,6 +110,7 @@
       padding: 15px;
       border-radius: 5px;
       margin-top: 10px;
+      white-space: pre-wrap; /* Correct alignment for bullet points */
     }
 
     footer {
@@ -116,6 +120,11 @@
       text-align: center;
       margin-top: 20px;
       width: 100%;
+    }
+
+    /* Prevent the page from moving horizontally on mobile */
+    html, body {
+      overflow-x: hidden;
     }
   </style>
 </head>
@@ -190,9 +199,9 @@
   <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
-    <textarea id="treatmentPlan" class="result" readonly>
+    <div id="treatmentPlan" class="result">
 En attente d'un diagnostic pour générer un plan de traitement...
-    </textarea>
+    </div>
   </div>
 
   <footer>
@@ -249,17 +258,11 @@ En attente d'un diagnostic pour générer un plan de traitement...
         }
 
         const data = await response.json();
-        console.log("Réponse API complète :", data);
-
         if (!data?.content || typeof data.content !== "string") {
           throw new Error("Réponse de Claude mal formatée ou vide.");
         }
 
         const diagnosisText = data.content.trim();
-        if (diagnosisText.length === 0) {
-          throw new Error("Le diagnostic retourné est vide.");
-        }
-
         diagnosisResult.textContent = diagnosisText;
 
         generateTreatmentPlan(
@@ -273,9 +276,8 @@ En attente d'un diagnostic pour générer un plan de traitement...
           diagnosisText
         );
       } catch (error) {
-        console.error("Erreur complète :", error);
         diagnosisResult.textContent =
-          "Erreur lors de l'établissement du diagnostic. Vérifiez vos données ou réessayez.";
+          "Erreur lors de l'établissement du diagnostic.";
       }
     }
 
@@ -304,7 +306,7 @@ En attente d'un diagnostic pour générer un plan de traitement...
             messages: [
               {
                 role: "user",
-                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}, Diagnostic : ${diagnosis}. Génère un plan de traitement rigoureux et précis sous forme de bullet points.`,
+                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}, Diagnostic : ${diagnosis}. Génère un plan de traitement rigoureux et précis sous forme de bullet points uniquement.`,
               },
             ],
           }),
@@ -312,27 +314,20 @@ En attente d'un diagnostic pour générer un plan de traitement...
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("Erreur API pour le plan de traitement :", errorData);
+          console.error("Erreur API :", errorData);
           throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
         }
 
         const data = await response.json();
-        console.log("Réponse API Plan de Traitement :", data);
-
         if (!data?.content || typeof data.content !== "string") {
-          throw new Error("Réponse de Claude mal formatée ou vide pour le plan de traitement.");
+          throw new Error("Réponse de Claude mal formatée ou vide.");
         }
 
         const treatmentText = data.content.trim();
-        if (treatmentText.length === 0) {
-          throw new Error("Le plan de traitement retourné est vide.");
-        }
-
         treatmentPlan.textContent = treatmentText;
       } catch (error) {
-        console.error("Erreur complète pour le plan de traitement :", error);
         treatmentPlan.textContent =
-          "Erreur lors de la création du plan de traitement. Vérifiez vos données ou réessayez.";
+          "Erreur lors de la création du plan de traitement.";
       }
     }
   </script>
