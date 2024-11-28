@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <style>
-    /* Global Styles */
     body {
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
@@ -26,7 +25,6 @@
       text-align: center;
       padding: 30px 0;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      border-bottom: 4px solid #00337a;
       position: sticky;
       top: 0;
       z-index: 1000;
@@ -35,15 +33,12 @@
     header img {
       width: 80px;
       margin-bottom: 10px;
-      border-radius: 50%;
-      border: 2px solid white;
     }
 
     header h1 {
       font-size: 28px;
       font-weight: 700;
       margin: 0;
-      letter-spacing: 1px;
     }
 
     nav {
@@ -52,7 +47,7 @@
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       z-index: 10;
     }
 
@@ -64,29 +59,24 @@
       cursor: pointer;
       color: white;
       font-weight: bold;
-      border-radius: 30px;
-      text-align: center;
+      border-radius: 20px;
       transition: all 0.3s ease;
-    }
-
-    nav button:hover {
-      background-color: #003d80;
     }
 
     nav button.active {
       background-color: white;
       color: #0056b3;
       font-weight: bold;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .container {
       max-width: 90%;
-      margin: 30px auto;
-      padding: 30px;
+      margin: 20px auto;
+      padding: 20px;
       background: white;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-      border-radius: 20px;
+      border-radius: 15px;
       display: none;
       animation: fadeIn 0.5s ease-in-out;
     }
@@ -98,9 +88,9 @@
     h2 {
       color: #004aad;
       font-size: 22px;
-      margin-bottom: 20px;
       border-bottom: 2px solid #004aad;
       padding-bottom: 5px;
+      margin-bottom: 15px;
     }
 
     label {
@@ -108,7 +98,6 @@
       margin-top: 20px;
       display: block;
       font-size: 16px;
-      color: #333;
     }
 
     select, textarea, input[type="file"] {
@@ -116,13 +105,12 @@
       padding: 12px;
       margin-top: 10px;
       border: 1px solid #ccc;
-      border-radius: 10px;
-      box-sizing: border-box;
+      border-radius: 8px;
       font-size: 14px;
     }
 
     textarea {
-      height: 100px;
+      height: 80px;
       resize: none;
     }
 
@@ -132,11 +120,11 @@
 
     button {
       width: 100%;
-      padding: 15px;
+      padding: 12px;
       background-color: #004aad;
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
       margin-top: 20px;
@@ -150,7 +138,7 @@
 
     .result {
       background: #e9f4ff;
-      padding: 20px;
+      padding: 15px;
       border-radius: 10px;
       margin-top: 20px;
       white-space: pre-wrap;
@@ -162,12 +150,11 @@
     footer {
       background-color: #004aad;
       color: white;
-      padding: 20px 0;
+      padding: 15px 0;
       text-align: center;
       margin-top: 20px;
       width: 100%;
       font-size: 14px;
-      letter-spacing: 0.5px;
     }
 
     @keyframes fadeIn {
@@ -178,17 +165,6 @@
       to {
         opacity: 1;
         transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      header h1 {
-        font-size: 22px;
-      }
-
-      nav button {
-        font-size: 14px;
-        padding: 8px 15px;
       }
     }
   </style>
@@ -206,7 +182,6 @@
     <button onclick="showStep(4)">Treatment</button>
   </nav>
 
-  <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
     <h2>Patient Information</h2>
     <label for="gender">Gender:</label>
@@ -246,7 +221,6 @@
     <textarea id="conditions" placeholder="Example: Diabetes, hypertension, etc."></textarea>
   </div>
 
-  <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
     <h2>Symptoms and Medical Analysis</h2>
     <textarea id="symptoms" placeholder="Example: Back pain, muscle weakness..."></textarea>
@@ -254,14 +228,12 @@
     <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
   </div>
 
-  <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
     <h2>Diagnosis</h2>
     <button onclick="generateDiagnosis()">Get Diagnosis</button>
     <div id="diagnosisResult" class="result">Diagnosis result: Awaiting...</div>
   </div>
 
-  <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Treatment Plan</h2>
     <div id="treatmentPlan" class="result">
@@ -285,6 +257,43 @@
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
+    }
+
+    async function generateDiagnosis() {
+      const gender = document.getElementById("gender").value;
+      const age = document.getElementById("age").value;
+      const weight = document.getElementById("weight").value;
+      const height = document.getElementById("height").value;
+      const sport = document.getElementById("sport").value;
+      const conditions = document.getElementById("conditions").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+
+      diagnosisResult.textContent = "Analyzing...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            messages: [
+              {
+                role: "user",
+                content: `Patient Info: Gender: ${gender}, Age: ${age}, Weight: ${weight}, Height: ${height}, Sport: ${sport}, Conditions: ${conditions}, Symptoms: ${symptoms}`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        diagnosisResult.textContent = data.content.trim();
+      } catch (error) {
+        diagnosisResult.textContent = "Error analyzing the diagnosis.";
+        console.error("Error:", error);
+      }
     }
   </script>
 </body>
