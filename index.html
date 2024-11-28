@@ -4,199 +4,125 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PhysioCare Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* General styling */
+    /* Style global */
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #dbeeff, #f4faff);
+      background: linear-gradient(to bottom, #f5faff, #d6ebff);
       color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
     }
 
-    /* Header and logo */
     header {
-      background: linear-gradient(90deg, #0066cc, #0047a3);
+      background-color: #007bff;
       color: white;
       width: 100%;
       text-align: center;
-      padding: 30px 0;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      padding: 20px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     header img {
-      width: 100px;
-      height: 100px;
+      width: 80px;
       margin-bottom: 10px;
-      border-radius: 50%;
-      background: white;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    header h1 {
-      font-size: 1.8rem;
-      margin: 0;
-    }
-
-    /* Navigation bar */
     nav {
-      background: white;
+      background-color: #f5faff;
       width: 100%;
       display: flex;
       justify-content: space-around;
-      padding: 15px;
+      padding: 10px 0;
+      border-bottom: 2px solid #e0e0e0;
       position: sticky;
       top: 0;
       z-index: 10;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     nav button {
       background: none;
       border: none;
+      padding: 10px 15px;
       font-size: 16px;
-      font-weight: 600;
-      color: #0066cc;
-      padding: 10px 20px;
       cursor: pointer;
-      border-radius: 20px;
-      transition: all 0.3s ease;
+      color: #007bff;
+      font-weight: bold;
+      border-radius: 10px;
     }
 
-    nav button:hover,
     nav button.active {
-      background: #0066cc;
+      background-color: #007bff;
       color: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    /* Main container design */
     .container {
-      max-width: 800px;
-      margin: 30px auto;
-      padding: 25px;
+      max-width: 90%;
+      margin: 20px auto;
+      padding: 20px;
       background: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
       display: none;
-      animation: fadeIn 0.6s ease-in-out;
     }
 
     .container.active {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     h2 {
-      color: #0047a3;
-      border-bottom: 3px solid #0066cc;
+      color: #007bff;
+      border-bottom: 2px solid #007bff;
       padding-bottom: 5px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-weight: 600;
-      color: #333;
-      display: block;
-      margin-top: 15px;
-    }
-
-    select, textarea, input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    textarea {
-      height: 100px;
-    }
-
-    .file-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .file-preview img, .file-preview .file {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #f0f9ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      text-align: center;
-    }
-
-    .result {
-      background: #f0f9ff;
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-      color: #0047a3;
-      font-weight: 500;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 100%;
-      padding: 12px;
-      background-color: #0066cc;
+      padding: 10px;
+      background-color: #007bff;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 5px;
       font-size: 16px;
-      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     button:hover {
-      background-color: #0047a3;
+      background-color: #0056b3;
+    }
+
+    textarea, select, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .result {
+      background: #f0f8ff;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 10px;
     }
 
     footer {
-      background-color: #0047a3;
+      background-color: #007bff;
       color: white;
-      padding: 15px 0;
+      padding: 10px 0;
       text-align: center;
-      margin-top: 40px;
+      margin-top: 20px;
       width: 100%;
-      font-size: 14px;
-      font-weight: 500;
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="PhysioCare Logo">
+    <img src="logo.png" alt="Logo PhysioCare">
     <h1>PhysioCare Pro</h1>
   </header>
 
@@ -207,48 +133,67 @@
     <button onclick="showStep(4)">Plan de Traitement</button>
   </nav>
 
-  <!-- Step 1: Patient Information -->
+  <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
     <h2>Informations Patient</h2>
-    <label for="gender">Genre</label>
+    <label for="gender">Genre :</label>
     <select id="gender">
-      <option value="homme">Homme</option>
-      <option value="femme">Femme</option>
+      <option value="Homme">Homme</option>
+      <option value="Femme">Femme</option>
     </select>
-    <label for="age">Âge</label>
+    <label for="age">Âge :</label>
     <select id="age">
-      <option value="18-25">18-25</option>
-      <option value="26-35">26-35</option>
-      <option value="36-50">36-50</option>
-      <option value="51-65">51-65</option>
-      <option value="65+">65+</option>
+      <option value="18-30">18-30</option>
+      <option value="31-50">31-50</option>
+      <option value="51-70">51-70</option>
+      <option value="71+">71+</option>
     </select>
+    <label for="weight">Poids (kg) :</label>
+    <select id="weight">
+      <option value="50-60">50-60</option>
+      <option value="61-70">61-70</option>
+      <option value="71-80">71-80</option>
+      <option value="81+">81+</option>
+    </select>
+    <label for="height">Taille (cm) :</label>
+    <select id="height">
+      <option value="150-160">150-160</option>
+      <option value="161-170">161-170</option>
+      <option value="171-180">171-180</option>
+      <option value="181+">181+</option>
+    </select>
+    <label for="sport">Pratique sportive :</label>
+    <select id="sport">
+      <option value="Non">Non</option>
+      <option value="Occasionnellement">Occasionnellement</option>
+      <option value="Régulièrement">Régulièrement</option>
+      <option value="Professionnel">Professionnel</option>
+    </select>
+    <label for="conditions">Conditions médicales spécifiques :</label>
+    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
   </div>
 
-  <!-- Step 2: Symptoms and Medical Analyses -->
+  <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
     <h2>Symptômes et analyses médicales</h2>
-    <textarea id="symptoms" placeholder="Décrivez vos symptômes ici..."></textarea>
-    <h3>Ajoutez des fichiers d'analyse (PDF ou images)</h3>
+    <textarea id="symptoms" placeholder="Exemple : Douleur lombaire, faiblesse musculaire..."></textarea>
+    <h3>Ajouter des fichiers d'analyse (PDF ou Images)</h3>
     <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
-    <div id="filePreview" class="file-preview"></div>
   </div>
 
-  <!-- Step 3: Diagnosis -->
+  <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
     <h2>Diagnostic</h2>
     <button onclick="generateDiagnosis()">Obtenir un diagnostic</button>
-    <div id="diagnosisResult" class="result">
-      Résultat du diagnostic : En attente...
-    </div>
+    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
   </div>
 
-  <!-- Step 4: Treatment Plan -->
+  <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
-    <div id="treatmentPlan" class="result">
-      En attente d'un diagnostic pour générer un plan de traitement...
-    </div>
+    <textarea id="treatmentPlan" class="result" readonly>
+En attente d'un diagnostic pour générer un plan de traitement...
+    </textarea>
   </div>
 
   <footer>
@@ -256,22 +201,19 @@
   </footer>
 
   <script>
-    // Navigation between steps
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
       const buttons = document.querySelectorAll('nav button');
+
       steps.forEach((container, index) => {
         container.classList.remove('active');
         if (index + 1 === step) container.classList.add('active');
       });
+
       buttons.forEach((button, index) => {
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
-    }
-
-    async function generateDiagnosis() {
-      // Collect data and fetch diagnosis (as seen in prior fixes)
     }
   </script>
 </body>
