@@ -21,27 +21,42 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         model: requestData.model,
         max_tokens: requestData.max_tokens,
-        messages: requestData.messages,
-        system: requestData.system
+        messages: [{
+          role: "user",
+          content: requestData.messages[0].content
+        }]
       })
     });
 
     const data = await response.json();
-    
+    console.log('API Response:', data);  // Pour le débogage
+
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+        content: [{
+          text: data.content || data.messages?.[0]?.content || "Pas de réponse disponible"
+        }]
+      })
     };
   } catch (error) {
+    console.error('Function Error:', error);  // Pour le débogage
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ 
         error: 'Internal Server Error',
-        details: error.message 
+        details: error.message,
+        content: [{
+          text: "Une erreur est survenue lors du traitement de la requête."
+        }]
       })
     };
   }
