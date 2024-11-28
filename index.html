@@ -222,13 +222,15 @@ En attente d'un diagnostic pour générer un plan de traitement...
       const conditions = document.getElementById("conditions").value;
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
-
+    
       diagnosisResult.textContent = "Analyse en cours...";
-
+    
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
             messages: [
@@ -239,21 +241,30 @@ En attente d'un diagnostic pour générer un plan de traitement...
             ],
           }),
         });
-
+    
         if (!response.ok) {
           const errorData = await response.json();
           console.error("Erreur API :", errorData);
           throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
         }
-
+    
         const data = await response.json();
-        const diagnosis = data?.content?.[0]?.text;
-
-        if (!diagnosis || diagnosis.trim().length === 0) {
-          throw new Error("Le diagnostic retourné est vide ou mal formaté.");
+        console.log("Réponse API complète :", data);
+    
+        // Vérification stricte de la structure de la réponse
+        const content = data?.content;
+        if (!Array.isArray(content) || !content[0]?.text) {
+          throw new Error("Réponse de Claude mal formatée ou vide.");
         }
-
-        diagnosisResult.textContent = diagnosis;
+    
+        // Extraction du texte du diagnostic
+        const diagnosisText = content[0].text.trim();
+        if (diagnosisText.length === 0) {
+          throw new Error("Le diagnostic retourné est vide.");
+        }
+    
+        // Affichage du diagnostic
+        diagnosisResult.textContent = diagnosisText;
       } catch (error) {
         console.error("Erreur complète :", error);
         diagnosisResult.textContent =
