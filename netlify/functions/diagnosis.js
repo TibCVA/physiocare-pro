@@ -35,8 +35,10 @@ exports.handler = async (event) => {
     console.log('Claude Response:', claudeData);
 
     // Vérification de la structure de la réponse
-    if (!claudeData.content || !claudeData.content[0] || !claudeData.content[0].text) {
-      throw new Error('Format de réponse Claude invalide');
+    if (!claudeResponse.ok) {
+      const errorText = await claudeResponse.text(); // Lire le corps de la réponse
+      console.error(`Erreur Claude API: ${errorText}`); // Logger les détails de l'erreur
+      throw new Error(`Claude API error: ${claudeResponse.statusText}`);
     }
 
     return {
