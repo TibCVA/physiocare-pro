@@ -209,47 +209,75 @@ En attente d'un diagnostic pour générer un plan de traitement...
       });
     }
 
-    async function generateDiagnosis() {
-      const gender = document.getElementById("gender").value;
-      const age = document.getElementById("age").value;
-      const weight = document.getElementById("weight").value;
-      const height = document.getElementById("height").value;
-      const sport = document.getElementById("sport").value;
-      const conditions = document.getElementById("conditions").value;
-      const symptoms = document.getElementById("symptoms").value;
-      const diagnosisResult = document.getElementById("diagnosisResult");
-
-      diagnosisResult.textContent = "Analyse en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-              {
-                role: "user",
-                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
-              },
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
+    <script>
+      async function generateDiagnosis() {
+        const gender = document.getElementById("gender").value;
+        const age = document.getElementById("age").value;
+        const weight = document.getElementById("weight").value;
+        const height = document.getElementById("height").value;
+        const sport = document.getElementById("sport").value;
+        const conditions = document.getElementById("conditions").value;
+        const symptoms = document.getElementById("symptoms").value;
+        const diagnosisResult = document.getElementById("diagnosisResult");
+    
+        // Mise à jour de l'interface pour l'utilisateur
+        diagnosisResult.textContent = "Analyse en cours...";
+    
+        try {
+          // Log des données envoyées à l'API
+          console.log("Données envoyées à l'API :", {
+            gender,
+            age,
+            weight,
+            height,
+            sport,
+            conditions,
+            symptoms,
+          });
+    
+          const response = await fetch("/.netlify/functions/diagnosis", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "claude-3-5-sonnet-20241022",
+              messages: [
+                {
+                  role: "user",
+                  content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
+                },
+              ],
+            }),
+          });
+    
+          // Vérification du statut de la requête
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Erreur API :", errorData);
+            throw new Error(errorData.error || `Erreur HTTP : ${response.status}`);
+          }
+    
+          // Traitement de la réponse API
+          const data = await response.json();
+          console.log("Réponse brute API :", data);
+    
+          // Validation de la structure de la réponse
+          const diagnosis = data?.content?.[0]?.text;
+    
+          if (!diagnosis || diagnosis.trim().length === 0) {
+            throw new Error("Le diagnostic retourné est vide ou mal formaté.");
+          }
+    
+          // Affichage du diagnostic
+          diagnosisResult.textContent = diagnosis;
+        } catch (error) {
+          // Gestion des erreurs avec des logs détaillés
+          console.error("Erreur complète :", error);
+          diagnosisResult.textContent =
+            "Erreur lors de l'établissement du diagnostic. Vérifiez vos données ou réessayez.";
         }
-
-        const data = await response.json();
-        diagnosisResult.textContent =
-          data.content?.[0]?.text || "Pas de diagnostic disponible.";
-      } catch (error) {
-        console.error("Erreur complète : ", error);
-        diagnosisResult.textContent =
-          "Erreur lors de l'établissement du diagnostic.";
       }
-    }
-  </script>
+    </script>
 </body>
 </html>
