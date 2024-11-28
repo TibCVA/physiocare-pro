@@ -5,79 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <style>
-    /* Styles identiques à la version précédente */
+    /* Global Styles */
     body {
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom, #f5faff, #d6ebff);
+      background: linear-gradient(to bottom, #e0f7ff, #ffffff);
       color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
+      scroll-behavior: smooth;
     }
 
     header {
-      background-color: #0056b3;
+      background-color: #004aad;
       color: white;
       width: 100%;
       text-align: center;
-      padding: 20px 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      border-bottom: 4px solid #003d80;
+      padding: 30px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      border-bottom: 4px solid #00337a;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     header img {
-      width: 70px;
+      width: 80px;
       margin-bottom: 10px;
       border-radius: 50%;
       border: 2px solid white;
     }
 
     header h1 {
-      font-size: 24px;
+      font-size: 28px;
+      font-weight: 700;
       margin: 0;
+      letter-spacing: 1px;
     }
 
     nav {
-      background-color: #007bff;
+      background-color: #0056b3;
       width: 100%;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
-      position: sticky;
-      top: 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       z-index: 10;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     nav button {
       background: none;
       border: none;
-      padding: 10px 15px;
-      font-size: 14px;
+      padding: 10px 20px;
+      font-size: 16px;
       cursor: pointer;
       color: white;
       font-weight: bold;
-      border-radius: 20px;
+      border-radius: 30px;
       text-align: center;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+    }
+
+    nav button:hover {
+      background-color: #003d80;
     }
 
     nav button.active {
       background-color: white;
-      color: #007bff;
+      color: #0056b3;
       font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
 
     .container {
       max-width: 90%;
-      margin: 20px auto;
-      padding: 20px;
+      margin: 30px auto;
+      padding: 30px;
       background: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
       border-radius: 20px;
       display: none;
       animation: fadeIn 0.5s ease-in-out;
@@ -88,32 +96,24 @@
     }
 
     h2 {
-      color: #0056b3;
-      border-bottom: 2px solid #0056b3;
+      color: #004aad;
+      font-size: 22px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #004aad;
       padding-bottom: 5px;
-      margin-bottom: 15px;
     }
 
-    button {
-      width: 100%;
-      padding: 15px;
-      background-color: #0056b3;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
+    label {
+      font-weight: bold;
       margin-top: 20px;
-      transition: background-color 0.3s ease;
+      display: block;
+      font-size: 16px;
+      color: #333;
     }
 
-    button:hover {
-      background-color: #003d80;
-    }
-
-    textarea, select, input[type="file"] {
+    select, textarea, input[type="file"] {
       width: 100%;
-      padding: 15px;
+      padding: 12px;
       margin-top: 10px;
       border: 1px solid #ccc;
       border-radius: 10px;
@@ -121,28 +121,53 @@
       font-size: 14px;
     }
 
+    textarea {
+      height: 100px;
+      resize: none;
+    }
+
     textarea::placeholder, select::placeholder {
-      color: #999;
+      color: #aaa;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: #004aad;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00337a;
     }
 
     .result {
       background: #e9f4ff;
-      padding: 15px;
+      padding: 20px;
       border-radius: 10px;
       margin-top: 20px;
       white-space: pre-wrap;
       font-size: 14px;
       font-family: 'Roboto Mono', monospace;
+      border-left: 4px solid #004aad;
     }
 
     footer {
-      background-color: #0056b3;
+      background-color: #004aad;
       color: white;
-      padding: 10px 0;
+      padding: 20px 0;
       text-align: center;
       margin-top: 20px;
       width: 100%;
-      box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 14px;
+      letter-spacing: 0.5px;
     }
 
     @keyframes fadeIn {
@@ -153,6 +178,17 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 22px;
+      }
+
+      nav button {
+        font-size: 14px;
+        padding: 8px 15px;
       }
     }
   </style>
@@ -249,87 +285,6 @@
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
-    }
-
-    async function generateDiagnosis() {
-      const gender = document.getElementById("gender").value;
-      const age = document.getElementById("age").value;
-      const weight = document.getElementById("weight").value;
-      const height = document.getElementById("height").value;
-      const sport = document.getElementById("sport").value;
-      const conditions = document.getElementById("conditions").value;
-      const symptoms = document.getElementById("symptoms").value;
-      const diagnosisResult = document.getElementById("diagnosisResult");
-
-      diagnosisResult.textContent = "Analyse en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-              {
-                role: "user",
-                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
-              },
-            ],
-          }),
-        });
-
-        const data = await response.json();
-        const diagnosisText = data.content.trim();
-        diagnosisResult.textContent = diagnosisText;
-
-        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
-      } catch (error) {
-        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
-        console.error("Erreur API:", error);
-      }
-    }
-
-    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
-      const treatmentPlan = document.getElementById("treatmentPlan");
-      treatmentPlan.textContent = "Création du plan de traitement en cours...";
-
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-              {
-                role: "user",
-                content: `
-Patient: 
-- Genre: ${gender}
-- Âge: ${age}
-- Poids: ${weight}
-- Taille: ${height}
-- Sport: ${sport}
-- Conditions médicales spécifiques: ${conditions}
-- Symptômes: ${symptoms}
-
-Diagnostic: ${diagnosis}
-
-Tâche : Basé sur les informations ci-dessus, générez un **protocole de soins précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et de l'état de l'art en kinésithérapie. Ne donnez pas de diagnostic. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.Précisez que ce n'est qu'une proposition qui devra être formellement validée par un expert médical`,
-              },
-            ],
-          }),
-        });
-
-        const data = await response.json();
-        treatmentPlan.textContent = data.content.trim();
-      } catch (error) {
-        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
-        console.error("Erreur complète :", error);
-      }
     }
   </script>
 </body>
