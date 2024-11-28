@@ -21,6 +21,14 @@
       --error-color: #ff4d4d;
     }
 
+    /* Mode sombre */
+    body.dark-mode {
+      --primary-color: #1f1f1f;
+      --background-color: #121212;
+      --text-color: #f5f5f5;
+      --light-gray: #333;
+    }
+
     /* Styles globaux */
     body {
       font-family: 'Roboto', Arial, sans-serif;
@@ -32,6 +40,7 @@
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* Style du header */
@@ -58,6 +67,22 @@
       font-size: 24px;
       margin: 0;
       font-weight: 700;
+    }
+
+    /* Bouton pour basculer le thème */
+    #theme-toggle {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    #theme-toggle:hover {
+      transform: scale(1.2);
     }
 
     /* Style de la navigation */
@@ -99,17 +124,19 @@
     .container {
       max-width: 100%;
       width: 90%;
-      margin: 20px auto 80px auto;
+      margin: 20px auto;
       padding: 20px;
       background: white;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       border-radius: 15px;
       display: none;
-      animation: fadeIn 0.5s ease-in-out;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
     }
 
     .container.active {
       display: block;
+      opacity: 1;
     }
 
     h2 {
@@ -161,21 +188,53 @@
       margin-top: 20px;
       font-weight: 500;
       transition: background-color 0.3s ease;
+      animation: pulse 2s infinite;
     }
 
     button.primary-btn:hover {
       background-color: var(--secondary-color);
     }
 
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
     /* Style des résultats */
     .result {
-      background: var(--light-gray);
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
+      background: #e3f2fd;
+      padding: 25px;
+      border-radius: 15px;
+      margin-top: 30px;
       white-space: pre-wrap;
-      font-size: 14px;
+      font-size: 16px;
       font-family: 'Roboto Mono', monospace;
+      border: 1px solid var(--primary-color);
+    }
+
+    .result ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .result ul li {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .result ul li::before {
+      content: "\f00c";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      color: var(--primary-color);
+      margin-right: 10px;
     }
 
     /* Style du footer */
@@ -219,6 +278,7 @@
   <header>
     <img src="logo.png" alt="Logo PhysioCare">
     <h1>PhysioCare Pro</h1>
+    <button id="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
   </header>
 
   <nav>
@@ -260,9 +320,11 @@
 
     <label for="weight">Poids (kg) :</label>
     <input type="number" id="weight" placeholder="Exemple : 70">
+    <span class="error-message"></span>
 
     <label for="height">Taille (cm) :</label>
     <input type="number" id="height" placeholder="Exemple : 175">
+    <span class="error-message"></span>
 
     <label for="sport">Activité Sportive :</label>
     <select id="sport">
@@ -271,6 +333,9 @@
       <option value="Régulière">Régulière</option>
       <option value="Professionnelle">Professionnelle</option>
     </select>
+    <span class="tooltip">i
+      <span class="tooltiptext">Une activité sportive professionnelle implique un entraînement régulier, intense et compétitif.</span>
+    </span>
 
     <label for="conditions">Conditions Médicales Spécifiques :</label>
     <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
@@ -289,8 +354,11 @@
   <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
     <h2>Diagnostic</h2>
-    <button class="primary-btn" onclick="generateDiagnosis()">Obtenir le Diagnostic</button>
+    <button class="primary-btn" onclick="confirmGenerateDiagnosis()">Obtenir le Diagnostic</button>
     <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
+    <div id="loader" style="display: none;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i> Analyse en cours...
+    </div>
   </div>
 
   <!-- Étape 4 : Plan de Traitement -->
@@ -319,6 +387,16 @@
       });
     }
 
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function confirmGenerateDiagnosis() {
+      if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
+        generateDiagnosis();
+      }
+    }
+
     async function generateDiagnosis() {
       const gender = document.getElementById("gender").value;
       const age = document.getElementById("age").value;
@@ -328,8 +406,10 @@
       const conditions = document.getElementById("conditions").value;
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
+      const loader = document.getElementById("loader");
 
-      diagnosisResult.textContent = "Analyse en cours...";
+      diagnosisResult.textContent = "";
+      loader.style.display = "block";
 
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
@@ -357,6 +437,8 @@
       } catch (error) {
         diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
         console.error("Erreur API:", error);
+      } finally {
+        loader.style.display = "none";
       }
     }
 
