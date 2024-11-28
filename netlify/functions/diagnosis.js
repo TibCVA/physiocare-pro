@@ -44,21 +44,30 @@ exports.handler = async (event) => {
     });
 
     if (!claudeResponse.ok) {
-      const errorText = await claudeResponse.text(); // Log the full error response
+      const errorText = await claudeResponse.text();
       console.error(`Erreur Claude API: ${errorText}`);
       throw new Error(`Claude API error: ${claudeResponse.statusText}`);
     }
 
     const claudeData = await claudeResponse.json();
-    console.log('Claude API Réponse:', claudeData);
+    console.log('Claude API Réponse complète :', claudeData);
 
-    // Correct extraction of the diagnostic content
-    const diagnosis = claudeData.content?.[0]?.text; // Extract the first text block
-    if (!diagnosis || diagnosis.trim().length === 0) {
-      throw new Error('Réponse de Claude invalide ou vide.');
+    // Vérification renforcée de la réponse
+    console.log('Vérification de la réponse Claude :', claudeData.content);
+    console.log('Premier élément de content :', claudeData.content?.[0]);
+    console.log('Texte du diagnostic :', claudeData.content?.[0]?.text);
+
+    const diagnosis =
+      claudeData.content &&
+      Array.isArray(claudeData.content) &&
+      claudeData.content[0]?.text?.trim();
+
+    if (!diagnosis) {
+      console.error('La réponse Claude est mal formée ou vide.', claudeData);
+      throw new Error('Pas de diagnostic disponible.');
     }
 
-    // Return the diagnosis
+    // Retour du diagnostic
     return {
       statusCode: 200,
       headers: {
@@ -66,7 +75,7 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        content: diagnosis // Send the extracted text as the response
+        content: diagnosis
       })
     };
   } catch (error) {
