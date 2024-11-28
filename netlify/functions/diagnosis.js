@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   try {
     const requestData = JSON.parse(event.body);
     
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,7 +20,6 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         model: requestData.model,
-        max_tokens: requestData.max_tokens,
         messages: [{
           role: "user",
           content: requestData.messages[0].content
@@ -28,8 +27,17 @@ exports.handler = async (event) => {
       })
     });
 
-    const data = await response.json();
-    console.log('API Response:', data);  // Pour le débogage
+    if (!claudeResponse.ok) {
+      throw new Error(`Claude API error: ${claudeResponse.status}`);
+    }
+
+    const claudeData = await claudeResponse.json();
+    console.log('Claude Response:', claudeData);
+
+    // Vérification de la structure de la réponse
+    if (!claudeData.content || !claudeData.content[0] || !claudeData.content[0].text) {
+      throw new Error('Format de réponse Claude invalide');
+    }
 
     return {
       statusCode: 200,
@@ -39,12 +47,12 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         content: [{
-          text: data.content || data.messages?.[0]?.content || "Pas de réponse disponible"
+          text: claudeData.content[0].text
         }]
       })
     };
   } catch (error) {
-    console.error('Function Error:', error);  // Pour le débogage
+    console.error('Function Error:', error);
     return {
       statusCode: 500,
       headers: {
@@ -52,8 +60,7 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({ 
-        error: 'Internal Server Error',
-        details: error.message,
+        error: error.message,
         content: [{
           text: "Une erreur est survenue lors du traitement de la requête."
         }]
