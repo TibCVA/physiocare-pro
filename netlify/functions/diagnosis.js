@@ -52,7 +52,7 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse:', claudeData);
 
-    // Extract the diagnosis text from the response
+    // Extract the diagnosis text correctly
     const diagnosis = claudeData.content?.[0]?.text;
     if (!diagnosis) {
       throw new Error('Réponse de Claude invalide ou vide.');
@@ -66,7 +66,7 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        content: diagnosis
+        content: diagnosis // Send the extracted text as the response
       })
     };
   } catch (error) {
