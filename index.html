@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhysioCare Pro</title>
+  <style>
+    /* Design modernisé et professionnel */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #f4f4f9, #e8f5e9);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      width: 100%;
+      text-align: center;
+      padding: 20px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    nav {
+      background-color: #ffffff;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      border-bottom: 2px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+
+    nav button.active {
+      border-bottom: 2px solid #4CAF50;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      display: none;
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    h2 {
+      color: #4CAF50;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 5px;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    button img {
+      width: 20px;
+      height: 20px;
+    }
+
+    textarea, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .file-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .file-preview img, .file-preview .file {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: #e8f5e9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .result {
+      background: #e8f5e9;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PhysioCare Pro</h1>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showStep(1)">Données Patient</button>
+    <button onclick="showStep(2)">Diagnostic</button>
+    <button onclick="showStep(3)">Plan de Traitement</button>
+  </nav>
+
+  <!-- Étape 1 : Données / Informations Patient -->
+  <div class="container active" id="step1">
+    <h2>Données Patient</h2>
+    <textarea id="symptoms" placeholder="Exemple : Douleur lombaire, faiblesse musculaire..."></textarea>
+    <h3>Ajouter des fichiers d'analyse (PDF ou Images)</h3>
+    <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
+    <div id="filePreview" class="file-preview"></div>
+    <button onclick="saveFiles()">Enregistrer les fichiers</button>
+  </div>
+
+  <!-- Étape 2 : Établissement du Diagnostic -->
+  <div class="container" id="step2">
+    <h2>Diagnostic</h2>
+    <button onclick="generateDiagnosis()">Obtenir un diagnostic</button>
+    <div id="diagnosisResult" class="result">
+      Résultat du diagnostic : En attente...
+    </div>
+  </div>
+
+  <!-- Étape 3 : Plan de Traitement -->
+  <div class="container" id="step3">
+    <h2>Plan de Traitement</h2>
+    <textarea id="treatmentPlan" class="result" readonly>
+En attente d'un diagnostic pour générer un plan de traitement...
+    </textarea>
+  </div>
+
+  <footer>
+    © 2024 PhysioCare Pro - Votre assistant intelligent en kinésithérapie
+  </footer>
+
+  <script>
+    // Navigation entre les étapes
+    function showStep(step) {
+      const steps = document.querySelectorAll('.container');
+      const buttons = document.querySelectorAll('nav button');
+
+      steps.forEach((container, index) => {
+        container.classList.remove('active');
+        if (index + 1 === step) container.classList.add('active');
+      });
+
+      buttons.forEach((button, index) => {
+        button.classList.remove('active');
+        if (index + 1 === step) button.classList.add('active');
+      });
+    }
+
+    // Gestion des fichiers uploadés
+    const fileInput = document.getElementById("fileInput");
+    const filePreview = document.getElementById("filePreview");
+
+    fileInput.addEventListener("change", () => {
+      filePreview.innerHTML = "";
+      const files = fileInput.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        if (file.type.startsWith("image/")) {
+          reader.onload = (e) => {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            filePreview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const fileDiv = document.createElement("div");
+          fileDiv.classList.add("file");
+          fileDiv.textContent = file.name;
+          filePreview.appendChild(fileDiv);
+        }
+      }
+    });
+
+    // Fonction de diagnostic
+    async function generateDiagnosis() {
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+      const treatmentPlan = document.getElementById("treatmentPlan");
+
+      diagnosisResult.textContent = "Analyse en cours...";
+
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer VOTRE_CLE_API_OPENAI"
+          },
+          body: JSON.stringify({
+            model: "gpt-4",
+            messages: [
+              { role: "system", content: "Vous êtes un assistant en kinésithérapie." },
+              { role: "user", content: `Symptômes du patient : ${symptoms}` }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        const diagnosis = data.choices[0].message.content;
+
+        diagnosisResult.textContent = diagnosis;
+
+        treatmentPlan.textContent =
+          "Plan de traitement basé sur le diagnostic :\n- Renforcement musculaire\n- Étirements\n- Thérapie adaptée\n\nFréquence : 3 fois par semaine.";
+      } catch (error) {
+        diagnosisResult.textContent =
+          "Erreur lors de l'établissement du diagnostic.";
+      }
+    }
+
+    // Sauvegarde des fichiers
+    function saveFiles() {
+      alert("Pour sauvegarder définitivement les fichiers, ajoutez-les au dépôt GitHub.");
+    }
+  </script>
+</body>
+</html>
