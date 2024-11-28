@@ -132,7 +132,6 @@
     <button onclick="showStep(4)">Plan de Traitement</button>
   </nav>
 
-  <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
     <h2>Informations Patient</h2>
     <label for="gender">Genre :</label>
@@ -172,7 +171,6 @@
     <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
   </div>
 
-  <!-- Étape 2 : Symptômes -->
   <div class="container" id="step2">
     <h2>Symptômes et analyses médicales</h2>
     <textarea id="symptoms" placeholder="Exemple : Douleur lombaire, faiblesse musculaire..."></textarea>
@@ -180,14 +178,12 @@
     <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
   </div>
 
-  <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
     <h2>Diagnostic</h2>
     <button onclick="generateDiagnosis()">Obtenir un diagnostic</button>
     <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
   </div>
 
-  <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
     <textarea id="treatmentPlan" class="result" readonly>
@@ -203,12 +199,10 @@ En attente d'un diagnostic pour générer un plan de traitement...
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
       const buttons = document.querySelectorAll('nav button');
-
       steps.forEach((container, index) => {
         container.classList.remove('active');
         if (index + 1 === step) container.classList.add('active');
       });
-
       buttons.forEach((button, index) => {
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
@@ -230,9 +224,7 @@ En attente d'un diagnostic pour générer un plan de traitement...
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
             messages: [
@@ -245,16 +237,17 @@ En attente d'un diagnostic pour générer un plan de traitement...
         });
 
         if (!response.ok) {
-          throw new Error("Erreur API");
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Erreur lors de l'appel à l'API");
         }
 
         const data = await response.json();
         diagnosisResult.textContent =
           data.content?.[0]?.text || "Pas de diagnostic disponible.";
       } catch (error) {
+        console.error("Erreur complète : ", error);
         diagnosisResult.textContent =
           "Erreur lors de l'établissement du diagnostic.";
-        console.error("Erreur complète : ", error);
       }
     }
   </script>
