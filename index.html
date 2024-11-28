@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PhysioCare Pro</title>
   <style>
-    /* Style global */
+    /* Styles globaux */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
@@ -214,6 +214,50 @@ En attente d'un diagnostic pour générer un plan de traitement...
         button.classList.remove('active');
         if (index + 1 === step) button.classList.add('active');
       });
+    }
+
+    async function generateDiagnosis() {
+      const gender = document.getElementById("gender").value;
+      const age = document.getElementById("age").value;
+      const weight = document.getElementById("weight").value;
+      const height = document.getElementById("height").value;
+      const sport = document.getElementById("sport").value;
+      const conditions = document.getElementById("conditions").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+
+      diagnosisResult.textContent = "Analyse en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 1000,
+            messages: [
+              {
+                role: "user",
+                content: `Genre : ${gender}, Âge : ${age}, Poids : ${weight} kg, Taille : ${height} cm, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}`,
+              },
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erreur API");
+        }
+
+        const data = await response.json();
+        diagnosisResult.textContent =
+          data.content?.[0]?.text || "Pas de diagnostic disponible.";
+      } catch (error) {
+        diagnosisResult.textContent =
+          "Erreur lors de l'établissement du diagnostic.";
+        console.error("Erreur complète : ", error);
+      }
     }
   </script>
 </body>
