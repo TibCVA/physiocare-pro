@@ -15,7 +15,7 @@ exports.handler = async (event) => {
     const requiredFields = ['model', 'gender', 'age', 'weight', 'height', 'sport', 'symptoms', 'diagnostic', 'messages'];
 
     // Identifier les champs manquants
-    const missingFields = requiredFields.filter(field => !requestData[field]);
+    const missingFields = requiredFields.filter(field => !requestData[field] || (typeof requestData[field] === 'string' && requestData[field].trim() === ''));
 
     if (missingFields.length > 0) {
       console.error('Champs manquants dans la requête :', missingFields);
@@ -35,13 +35,13 @@ exports.handler = async (event) => {
     // Logs des données reçues
     console.log('Données reçues pour le plan de traitement :', requestData);
 
-    // Construction du prompt pour le plan de traitement
+    // Construction du prompt pour le plan de traitement (Simplifié)
     const prompt = `
 Patient:
 - Genre : ${requestData.gender}
 - Âge : ${requestData.age}
-- Poids : ${requestData.weight}
-- Taille : ${requestData.height}
+- Poids : ${requestData.weight} kg
+- Taille : ${requestData.height} cm
 - Sport : ${requestData.sport}
 - Conditions médicales spécifiques : ${requestData.conditions}
 - Symptômes : ${requestData.symptoms}
@@ -49,12 +49,14 @@ Patient:
 Diagnostic : ${requestData.diagnostic}
 
 Tâche :
-Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ce protocole doit être basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. **Ne donnez pas de diagnostic.** Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
+Générez un plan de traitement personnalisé incluant des exercices avec fréquence, intensité et positions correctes. Ne donnez pas de diagnostic. Assurez-vous que ce protocole soit validé par un professionnel de santé avant application.
     `;
 
     console.log('Prompt envoyé à Claude :', prompt);
 
-    // Appel à l'API Claude pour le plan de traitement
+    console.log('Avant l\'appel à l\'API Claude');
+
+    // Appel à l'API Claude pour le plan de traitement avec `max_tokens` réduit
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -64,7 +66,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1500, // Réduction à 1500
+        max_tokens: 1000, // Réduction à 1000
         messages: [
           {
             role: 'user',
@@ -87,8 +89,8 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
 
     const treatmentPlan =
       claudeData.content &&
-      Array.isArray(claudeData.content) &&
-      claudeData.content[0]?.text?.trim();
+      typeof claudeData.content === 'string' &&
+      claudeData.content.trim();
 
     if (!treatmentPlan) {
       console.error('La réponse de Claude est mal formée ou vide.', claudeData);
