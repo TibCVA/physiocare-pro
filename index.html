@@ -660,7 +660,7 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
+            model: "claude-3-5-haiku-latest",
             messages: [
               {
                 role: "user",
@@ -733,7 +733,7 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
 
       // Log des données envoyées pour le plan de traitement
       console.log('Données envoyées pour le plan de traitement :', {
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-5-haiku-latest",
         gender,
         age,
         weight,
@@ -765,7 +765,7 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
+            model: "claude-3-5-haiku-latest",
             gender: gender,
             age: age,
             weight: weight,
