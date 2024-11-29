@@ -8,9 +8,9 @@
   <!-- Importation des polices -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <!-- Importation des icônes SF Symbols via une alternative web -->
+  <!-- Importation des icônes (Font Awesome pour cet exemple) -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -23,11 +23,15 @@
       --background-color: #FFFFFF;
       --text-color: #1C1C1E;
       --light-gray: #E0E0E0;
-      --card-background: #FFFFFF;
-      --card-shadow: rgba(0, 0, 0, 0.05);
-      --highlight-color: rgba(88, 196, 147, 0.3);
-      --error-color: #FF3B30;
-      --success-color: #4CD964;
+      --input-background: #F4F4F4;
+      --input-border: #D0D0D0;
+      --button-hover-color: #007BCE;
+      --button-active-color: #00477C;
+      --button-download-color: #0056A1;
+      --nav-active-bg: #E0F3FF;
+      --section-padding: 16px;
+      --section-margin: 24px;
+      --border-radius: 8px;
     }
 
     /* Styles globaux */
@@ -59,15 +63,14 @@
 
     header img {
       width: 35px;
-      border-radius: 8px;
+      border-radius: var(--border-radius);
       margin-right: 15px;
     }
 
     header h1 {
-      font-size: 24px;
+      font-size: 22px;
       margin: 0;
-      font-weight: 700;
-      flex-grow: 1;
+      font-weight: 600;
       text-align: center;
     }
 
@@ -96,22 +99,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: color 0.3s ease;
+      transition: color 0.3s ease, background-color 0.3s ease;
       position: relative;
+      border-radius: var(--border-radius);
     }
 
     nav button.active {
       color: var(--primary-color);
-    }
-
-    nav button.active::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      width: 40%;
-      height: 3px;
-      background: var(--primary-color);
-      border-radius: 2px;
+      background-color: var(--nav-active-bg);
     }
 
     nav button i {
@@ -125,10 +120,10 @@
       width: 90%;
       margin-top: 100px;
       margin-bottom: 100px;
-      padding: 20px;
+      padding: var(--section-padding);
       background: var(--card-background);
       border-radius: 20px;
-      box-shadow: 0 4px 16px var(--card-shadow);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
       display: none;
       margin-left: auto;
       margin-right: auto;
@@ -152,30 +147,45 @@
 
     h2 {
       color: var(--primary-color);
-      margin-bottom: 24px;
+      margin-bottom: var(--section-margin);
       font-weight: 700;
-      font-size: 24px;
+      font-size: 22px;
       text-align: center;
     }
 
     /* Formulaires */
     .form-group {
-      margin-bottom: 24px;
+      margin-bottom: 16px;
       position: relative;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 4px;
+      display: block;
     }
 
     .form-group input,
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 14px 16px;
-      border: 1px solid var(--light-gray);
-      border-radius: 8px;
-      background-color: #F9F9F9;
+      height: 48px;
+      padding: 0 16px;
+      border: 1px solid var(--input-border);
+      border-radius: var(--border-radius);
+      background-color: var(--input-background);
       font-size: 16px;
       box-sizing: border-box;
       outline: none;
       transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .form-group textarea {
+      height: auto;
+      min-height: 100px;
+      padding-top: 12px;
+      padding-bottom: 12px;
     }
 
     .form-group input:focus,
@@ -185,52 +195,41 @@
       background-color: #fff;
     }
 
-    .form-group label {
-      position: absolute;
-      top: 14px;
-      left: 16px;
-      font-size: 16px;
-      color: #999;
-      pointer-events: none;
-      transition: all 0.2s ease;
-    }
-
-    .form-group input:not(:placeholder-shown) + label,
-    .form-group input:focus + label,
-    .form-group select:not(:placeholder-shown) + label,
-    .form-group select:focus + label,
-    .form-group textarea:not(:placeholder-shown) + label,
-    .form-group textarea:focus + label {
-      top: -10px;
-      left: 12px;
-      font-size: 12px;
-      background: #fff;
-      padding: 0 4px;
-      color: var(--primary-color);
-    }
-
     /* Boutons */
     .primary-btn {
       width: 100%;
-      padding: 14px;
+      height: 48px;
+      padding: 0 16px;
       background-color: var(--primary-color);
       color: #fff;
       border: none;
-      border-radius: 12px;
-      font-size: 18px;
+      border-radius: var(--border-radius);
+      font-size: 16px;
       font-weight: 700;
       cursor: pointer;
       transition: background-color 0.3s ease, transform 0.1s ease;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .primary-btn:hover {
-      background-color: #007BCE;
+      background-color: var(--button-hover-color);
     }
 
     .primary-btn:active {
-      background-color: #00477C;
+      background-color: var(--button-active-color);
       transform: scale(0.98);
+    }
+
+    .download-btn {
+      background-color: var(--button-download-color);
+      margin-top: var(--section-margin);
+    }
+
+    .download-btn i {
+      margin-right: 8px;
     }
 
     /* Loader */
@@ -246,18 +245,24 @@
     /* Résultats */
     .result {
       background: var(--light-gray);
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
+      padding: var(--section-padding);
+      border-radius: var(--border-radius);
+      margin-top: 16px;
       white-space: pre-wrap;
       font-size: 16px;
-      line-height: 1.6;
+      line-height: 1.5;
       color: var(--text-color);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .result strong {
       font-weight: 700;
+    }
+
+    /* Séparateurs */
+    .separator {
+      margin: var(--section-margin) 0;
+      border-top: 1px solid var(--light-gray);
     }
 
     /* Prévisualisation des fichiers */
@@ -267,7 +272,7 @@
       justify-content: space-between;
       background: #F9F9F9;
       padding: 10px;
-      border-radius: 8px;
+      border-radius: var(--border-radius);
       margin-top: 10px;
     }
 
@@ -278,25 +283,40 @@
       cursor: pointer;
     }
 
-    /* Espacement entre sections */
-    .section-divider {
-      margin-top: 24px;
-      margin-bottom: 24px;
-      border-top: 1px solid var(--light-gray);
+    /* Messages de confirmation */
+    .confirmation-message {
+      background-color: var(--accent-color);
+      color: #fff;
+      padding: 10px;
+      border-radius: var(--border-radius);
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 1001;
+      display: none;
+      align-items: center;
+    }
+
+    .confirmation-message.show {
+      display: flex;
+    }
+
+    .confirmation-message i {
+      margin-right: 8px;
     }
 
     /* Responsive */
     @media (max-width: 600px) {
       header h1 {
-        font-size: 22px;
+        font-size: 20px;
       }
 
       h2 {
-        font-size: 22px;
+        font-size: 20px;
       }
 
       .primary-btn {
-        font-size: 16px;
+        font-size: 14px;
       }
     }
   </style>
@@ -327,55 +347,61 @@
     </button>
   </nav>
 
+  <!-- Message de confirmation -->
+  <div id="confirmationMessage" class="confirmation-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="confirmationText"></span>
+  </div>
+
   <!-- Étape 1 : Informations Patient -->
   <div class="container active" id="step1">
     <h2>Informations du Patient</h2>
 
     <div class="form-group">
+      <label for="gender">Genre</label>
       <select id="gender" required>
-        <option value="" disabled selected></option>
+        <option value="" disabled selected>Sélectionnez le genre</option>
         <option value="Homme">Homme</option>
         <option value="Femme">Femme</option>
         <option value="Autre">Autre</option>
       </select>
-      <label for="gender">Genre</label>
     </div>
 
     <div class="form-group">
+      <label for="age">Âge</label>
       <select id="age" required>
-        <option value="" disabled selected></option>
+        <option value="" disabled selected>Sélectionnez l'âge</option>
         <option value="18-30">18-30</option>
         <option value="31-50">31-50</option>
         <option value="51-70">51-70</option>
         <option value="71+">71+</option>
       </select>
-      <label for="age">Âge</label>
     </div>
 
     <div class="form-group">
-      <input type="number" id="weight" placeholder=" " required>
       <label for="weight">Poids (kg)</label>
+      <input type="number" id="weight" placeholder="Entrez le poids" required>
     </div>
 
     <div class="form-group">
-      <input type="number" id="height" placeholder=" " required>
       <label for="height">Taille (cm)</label>
+      <input type="number" id="height" placeholder="Entrez la taille" required>
     </div>
 
     <div class="form-group">
+      <label for="sport">Activité Sportive</label>
       <select id="sport" required>
-        <option value="" disabled selected></option>
+        <option value="" disabled selected>Sélectionnez le niveau d'activité</option>
         <option value="Aucune">Aucune</option>
         <option value="Occasionnelle">Occasionnelle</option>
         <option value="Régulière">Régulière</option>
         <option value="Professionnelle">Professionnelle</option>
       </select>
-      <label for="sport">Activité Sportive</label>
     </div>
 
     <div class="form-group">
-      <textarea id="conditions" placeholder=" "></textarea>
       <label for="conditions">Conditions Médicales Spécifiques</label>
+      <textarea id="conditions" placeholder="Décrivez les conditions médicales spécifiques"></textarea>
     </div>
 
   </div>
@@ -385,14 +411,13 @@
     <h2>Symptômes et Analyses Médicales</h2>
 
     <div class="form-group">
-      <!-- Éditeur de texte enrichi -->
-      <div id="symptomsEditor"></div>
-      <label for="symptomsEditor">Symptômes</label>
+      <label for="symptoms">Symptômes</label>
+      <textarea id="symptoms" placeholder="Décrivez les symptômes du patient..."></textarea>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" style="text-align: center;">
       <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
-      <label for="fileInput"><i class="fas fa-upload"></i> Télécharger des fichiers d'analyse</label>
+      <label for="fileInput"><i class="fas fa-upload"></i> Choisir les fichiers</label>
       <div id="filePreview"></div>
     </div>
   </div>
@@ -406,35 +431,28 @@
     <div id="loader" style="display: none;">
       <i class="fas fa-spinner fa-spin"></i>&nbsp;Analyse en cours...
     </div>
-    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
+    <div class="result" id="diagnosisResult">Résultat du diagnostic : En attente...</div>
   </div>
 
   <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
-    <div id="treatmentPlan" class="result">
+    <div class="result" id="treatmentPlan">
       En attente du diagnostic pour générer le plan de traitement...
     </div>
-    <button class="primary-btn" onclick="downloadTreatmentPlanPDF()">
-      Télécharger le Plan de Traitement en PDF
+    <button class="primary-btn download-btn" onclick="downloadTreatmentPlanPDF()">
+      <i class="fas fa-file-download"></i> Télécharger le Plan de Traitement
     </button>
   </div>
 
   <!-- Scripts -->
-  <!-- Inclusion de l'éditeur de texte enrichi Quill -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script>
-    // Initialisation de l'éditeur Quill
-    var quill = new Quill('#symptomsEditor', {
-      theme: 'snow',
-      placeholder: 'Décrivez les symptômes du patient...'
-    });
-
     // Prévisualisation des fichiers téléchargés
     const fileInput = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    const confirmationText = document.getElementById('confirmationText');
 
     fileInput.addEventListener('change', () => {
       filePreview.innerHTML = '';
@@ -455,7 +473,16 @@
         fileDiv.appendChild(removeBtn);
         filePreview.appendChild(fileDiv);
       });
+      showConfirmation("Fichier(s) téléchargé(s) avec succès");
     });
+
+    function showConfirmation(message) {
+      confirmationText.textContent = message;
+      confirmationMessage.classList.add('show');
+      setTimeout(() => {
+        confirmationMessage.classList.remove('show');
+      }, 3000);
+    }
 
     // Navigation avec animations
     function showStep(step) {
@@ -489,7 +516,7 @@
       const height = document.getElementById("height").value;
       const sport = document.getElementById("sport").value;
       const conditions = document.getElementById("conditions").value;
-      const symptoms = quill.root.innerHTML; // Obtenir le contenu riche
+      const symptoms = document.getElementById("symptoms").value;
 
       const diagnosisResult = document.getElementById("diagnosisResult");
       const loader = document.getElementById("loader");
@@ -517,11 +544,11 @@
 
         const data = await response.json();
 
-        // Vérifier si la réponse contient le contenu attendu
         if (data && data.content) {
           const diagnosisText = data.content.trim();
-          diagnosisResult.innerHTML = diagnosisText;
+          diagnosisResult.textContent = diagnosisText;
           generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
+          showConfirmation("Diagnostic généré avec succès");
         } else {
           throw new Error("Réponse inattendue de l'API.");
         }
@@ -570,11 +597,10 @@ Tâche : Basé sur les informations ci-dessus, générez une **proposition théo
 
         const data = await response.json();
 
-        // Vérifier si la réponse contient le contenu attendu
         if (data && data.content) {
           const treatmentText = data.content.trim();
-          // Structurer le contenu avec des titres numérotés
-          treatmentPlan.innerHTML = treatmentText;
+          treatmentPlan.textContent = treatmentText;
+          showConfirmation("Plan de traitement généré avec succès");
         } else {
           throw new Error("Réponse inattendue de l'API.");
         }
@@ -596,6 +622,7 @@ Tâche : Basé sur les informations ci-dessus, générez une **proposition théo
       doc.text(treatmentPlanText, 10, 20, { maxWidth: 180 });
 
       doc.save("Plan_de_Traitement.pdf");
+      showConfirmation("Plan de traitement téléchargé avec succès");
     }
   </script>
 </body>
