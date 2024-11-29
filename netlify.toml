@@ -5,7 +5,9 @@
 
 [functions]
   node_bundler = "esbuild"
-  timeout = 26  # Augmente le délai d'exécution à 26 secondes
+
+[functions."*"]
+  timeout = 26
 
 [[redirects]]
   from = "/*"
