@@ -5,179 +5,221 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare</title>
-  <!-- Import Fonts and Icons -->
+  <!-- Importation des polices -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Importation des icônes (Font Awesome pour cet exemple) -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Importation de jsPDF pour la génération du PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <style>
-    /* Updated Variables */
+    /* Variables CSS pour les couleurs */
     :root {
-      --primary-color: #0066CC;
-      --secondary-color: #1A1A1A;
+      --primary-color: #005F9E;
+      --secondary-color: #333333;
       --accent-color: #58C493;
-      --background-color: #F4F7FB;
-      --card-background: #FFFFFF;
-      --text-color: #333333;
+      --background-color: #FFFFFF;
+      --text-color: #1A1A1A;
       --light-gray: #E0E0E0;
-      --dark-gray: #555555;
-      --button-hover: #005BB5;
-      --button-active: #004C9A;
-      --nav-active-bg: #EBF5FF;
-      --border-radius: 12px;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      --transition-speed: 0.3s;
-      --header-height: 70px;
-      --footer-height: 50px;
+      --input-background: #F7F7F7;
+      --input-border: #D0D0D0;
+      --button-hover-color: #007BCE;
+      --button-active-color: #00477C;
+      --button-download-color: #0056A1;
+      --nav-active-bg: #E0F3FF;
+      --section-padding: 16px;
+      --section-margin: 24px;
+      --border-radius: 8px;
+      --confirmation-bg: #E8F5E9;
+      --confirmation-text-color: #2E7D32;
+      --upload-bg: #FAFAFA;
+      --alert-warning-bg: #FFF9E0;
+      --alert-warning-text: #1A1A1A;
+      --header-height: 60px;
+      --header-padding: 0 20px;
+      --logo-size: 50px;
+      --title-size: 22pt;
+      --button-height: 50px;
+      --button-font-size: 18px;
+      --button-padding: 0 16px;
+      --footer-height: 40px;
     }
 
-    /* Reset and Global Styles */
+    /* Styles globaux */
     html,
     body {
+      overflow-x: hidden;
       margin: 0;
       padding: 0;
-      font-family: 'SF Pro Display', Arial, sans-serif;
-      background-color: var(--background-color);
+      background: var(--background-color);
       color: var(--text-color);
-      line-height: 1.6;
-      overflow-x: hidden;
+      font-family: 'SF Pro Display', 'Roboto Slab', 'Roboto', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
     }
 
     /* Style du header */
     header {
-      background: linear-gradient(135deg, var(--primary-color), var(--button-hover));
+      background: linear-gradient(135deg, #005F9E, #0073E6);
       color: white;
+      width: 100%;
       height: var(--header-height);
+      padding: var(--header-padding);
+      position: fixed;
+      top: 0;
+      z-index: 1000;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      position: fixed;
-      width: 100%;
-      z-index: 1000;
-      box-shadow: var(--shadow);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid #00477C;
     }
 
     @media (max-width: 600px) {
       header {
         height: 80px; /* Pour les écrans avec encoche */
-      }
-
-      header h1 {
-        font-size: 18px;
-      }
-
-      .primary-btn {
-        font-size: 14px;
-      }
-
-      nav button i {
-        font-size: 18px;
+        padding-top: 20px;
       }
     }
 
     header img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
+      width: var(--logo-size);
+      height: var(--logo-size);
       border-radius: var(--border-radius);
+      margin-right: 12px;
+      object-fit: contain;
     }
 
     header h1 {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: var(--title-size); /* Taille légèrement plus grosse */
       margin: 0;
+      font-weight: 600;
       text-align: center;
+      color: white; /* Titre en blanc */
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     /* Style de la navigation */
     nav {
-      background: #FFFFFF;
-      border-top: 1px solid var(--light-gray);
+      background: var(--background-color);
+      width: 100%;
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
       position: fixed;
       bottom: 0;
-      width: 100%;
-      z-index: 1000;
+      z-index: 999;
+      border-top: 1px solid var(--light-gray);
+      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
     }
 
     nav button {
       background: none;
       border: none;
-      color: var(--dark-gray);
-      font-size: 14px;
-      text-align: center;
+      padding: 10px;
+      font-size: 12px;
       cursor: pointer;
-      transition: color var(--transition-speed), background var(--transition-speed);
-      padding: 8px 12px;
+      color: var(--text-color);
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: color 0.3s ease, background-color 0.3s ease;
+      position: relative;
       border-radius: var(--border-radius);
+      width: 70px;
+      height: 100%;
     }
 
     nav button.active {
       color: var(--primary-color);
-      background: var(--nav-active-bg);
+      background-color: var(--nav-active-bg);
+    }
+
+    nav button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      width: 40%;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 2px;
     }
 
     nav button i {
-      font-size: 22px;
-      margin-bottom: 5px;
-      color: var(--primary-color);
+      font-size: 24px;
+      margin-bottom: 3px;
     }
 
     /* Style des conteneurs */
     .container {
-      margin: calc(var(--header-height) + 20px) auto calc(var(--footer-height) + 60px);
-      padding: 20px;
-      background: var(--card-background);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
       max-width: 600px;
-      transition: transform var(--transition-speed), opacity var(--transition-speed);
+      width: 90%;
+      margin-top: 100px;
+      margin-bottom: 120px; /* Augmenté pour éviter le chevauchement avec le nav */
+      padding: var(--section-padding);
+      background: var(--background-color);
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
       display: none;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .container.active {
       display: block;
-      transform: scale(1);
-      opacity: 1;
+      animation: fadeIn 0.3s ease-in-out;
     }
 
-    .container h2 {
-      font-size: 22px;
-      font-weight: 600;
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
       color: var(--primary-color);
-      margin-bottom: 16px;
+      margin-bottom: var(--section-margin);
+      font-weight: 700;
+      font-size: 22px;
       text-align: center;
     }
 
     /* Formulaires */
     .form-group {
       margin-bottom: 16px;
+      position: relative;
     }
 
     .form-group label {
       font-size: 14px;
-      color: var(--dark-gray);
-      display: block;
+      color: #999;
       margin-bottom: 4px;
+      display: block;
     }
 
     .form-group input,
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      color: var(--text-color);
-      background: var(--background-color);
-      border: 1px solid var(--light-gray);
+      height: 44px;
+      padding: 0 16px;
+      border: 1px solid var(--input-border);
       border-radius: var(--border-radius);
+      background-color: var(--input-background);
+      font-size: 16px;
       box-sizing: border-box;
-      transition: border var(--transition-speed), background var(--transition-speed);
+      outline: none;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
     }
 
     .form-group textarea {
@@ -185,46 +227,50 @@
       min-height: 100px;
       padding-top: 12px;
       padding-bottom: 12px;
-      background-color: var(--background-color);
+      background-color: var(--upload-bg);
     }
 
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
       border-color: var(--primary-color);
-      background: white;
+      background-color: #fff;
     }
 
     /* Boutons */
     .primary-btn {
-      background: var(--primary-color);
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      padding: 12px 20px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      transition: background var(--transition-speed), transform 0.1s;
-      text-align: center;
       width: 100%;
-    }
-
-    .primary-btn:hover {
-      background: var(--button-hover);
-    }
-
-    .primary-btn:active {
-      transform: scale(0.98);
-    }
-
-    .download-btn {
-      background: var(--primary-color);
-      margin-top: 24px;
+      height: var(--button-height);
+      padding: var(--button-padding);
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: var(--button-font-size);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .primary-btn:hover {
+      background-color: var(--button-hover-color);
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .primary-btn:active {
+      background-color: var(--button-active-color);
+      transform: scale(0.98);
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .download-btn {
+      background-color: var(--button-download-color);
+      margin-top: var(--section-margin);
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .download-btn i {
@@ -243,17 +289,25 @@
 
     /* Résultats */
     .result {
-      background: var(--background-color);
-      padding: 16px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow);
-      color: var(--text-color);
-      white-space: pre-wrap;
+      background: var(--light-gray);
+      padding: var(--section-padding);
+      border-radius: 20px;
       margin-top: 16px;
+      white-space: pre-wrap;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--text-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .result strong {
       font-weight: 700;
+    }
+
+    /* Séparateurs */
+    .separator {
+      margin: var(--section-margin) 0;
+      border-top: 1px solid var(--light-gray);
     }
 
     /* Prévisualisation des fichiers */
@@ -261,25 +315,23 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--background-color);
+      background: var(--upload-bg);
       padding: 10px;
       border-radius: var(--border-radius);
       margin-top: 10px;
-      box-shadow: var(--shadow);
     }
 
     #filePreview button {
       background: none;
       border: none;
-      color: #FF4D4D;
+      color: var(--error-color);
       cursor: pointer;
-      font-size: 14px;
     }
 
     /* Messages de confirmation */
     .confirmation-message {
-      background-color: #E8F5E9;
-      color: #2E7D32;
+      background-color: var(--confirmation-bg);
+      color: var(--confirmation-text-color);
       padding: 10px 16px;
       border-radius: var(--border-radius);
       position: fixed;
@@ -288,7 +340,7 @@
       z-index: 1001;
       display: none;
       align-items: center;
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .confirmation-message.show {
@@ -327,7 +379,7 @@
       display: flex;
       align-items: center;
       margin-top: 16px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .alert-warning i {
@@ -341,18 +393,36 @@
       color: #999;
       padding: 10px 0;
       position: fixed;
-      bottom: 0;
+      bottom: 60px; /* Positionner au-dessus de la barre de navigation */
       width: 100%;
-      background: var(--card-background);
-      box-shadow: var(--shadow);
+      background: var(--background-color);
+      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
       z-index: 998;
     }
 
-    /* Loader et résultats spécifiques */
-    .result i {
-      margin-right: 8px;
-    }
+    /* Responsive */
+    @media (max-width: 600px) {
+      header {
+        height: 80px; /* Pour les écrans avec encoche */
+        padding-top: 20px;
+      }
 
+      header h1 {
+        font-size: 22pt; /* Ajustement pour une meilleure lisibilité */
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .primary-btn {
+        font-size: 18px; /* Texte plus gros */
+      }
+
+      nav button i {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 
@@ -388,7 +458,7 @@
   </div>
 
   <!-- Étape 1 : Informations Patient -->
-  <div id="step1" class="container active">
+  <div class="container active" id="step1">
     <h2>Informations du Patient</h2>
 
     <div class="form-group">
@@ -440,7 +510,7 @@
   </div>
 
   <!-- Étape 2 : Symptômes et Analyses Médicales -->
-  <div id="step2" class="container">
+  <div class="container" id="step2">
     <h2>Symptômes et Analyses Médicales</h2>
 
     <div class="form-group">
@@ -458,7 +528,7 @@
   </div>
 
   <!-- Étape 3 : Diagnostic -->
-  <div id="step3" class="container">
+  <div class="container" id="step3">
     <h2>Diagnostic</h2>
     <button class="primary-btn" onclick="confirmGenerateDiagnosis()">
       Obtenir le Diagnostic
@@ -470,7 +540,7 @@
   </div>
 
   <!-- Étape 4 : Plan de Traitement -->
-  <div id="step4" class="container">
+  <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
     <div class="result" id="treatmentPlan">
       En attente du diagnostic pour générer le plan de traitement...
@@ -480,6 +550,7 @@
     </button>
   </div>
 
+  <!-- Footer -->
   <footer>
     &copy; Thibaut Lacour 2024, All rights reserved.
   </footer>
