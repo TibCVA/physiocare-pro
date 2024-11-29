@@ -562,7 +562,7 @@
     const filePreview = document.getElementById('filePreview');
     const confirmationMessage = document.getElementById('confirmationMessage');
     const confirmationText = document.getElementById('confirmationText');
-
+  
     fileInput.addEventListener('change', () => {
       filePreview.innerHTML = '';
       Array.from(fileInput.files).forEach(file => {
@@ -589,7 +589,7 @@
         showConfirmation("Fichier(s) téléchargé(s) avec succès");
       }
     });
-
+  
     function showConfirmation(message) {
       confirmationText.textContent = message;
       confirmationMessage.classList.add('show');
@@ -597,7 +597,7 @@
         confirmationMessage.classList.remove('show');
       }, 3000);
     }
-
+  
     // Navigation avec animations
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
@@ -614,14 +614,14 @@
         if (index + 1 === step) button.classList.add('active');
       });
     }
-
+  
     // Confirmation et génération du diagnostic
     function confirmGenerateDiagnosis() {
       if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
         generateDiagnosis();
       }
     }
-
+  
     // Génération du diagnostic
     async function generateDiagnosis() {
       const gender = document.getElementById("gender").value;
@@ -631,13 +631,24 @@
       const sport = document.getElementById("sport").value;
       const conditions = document.getElementById("conditions").value;
       const symptoms = document.getElementById("symptoms").value;
-
+  
       const diagnosisResult = document.getElementById("diagnosisResult");
       const loader = document.getElementById("loader");
-
+  
       diagnosisResult.innerHTML = "";
       loader.style.display = "flex";
-
+  
+      // Log des données collectées
+      console.log('Données collectées pour le diagnostic :', {
+        gender,
+        age,
+        weight,
+        height,
+        sport,
+        conditions,
+        symptoms
+      });
+  
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
@@ -646,35 +657,38 @@
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 5000, // Réduction des tokens pour éviter les surcharges
             messages: [
               {
                 role: "user",
                 content: `
-Patient:
-- Genre : ${gender}
-- Âge : ${age}
-- Poids : ${weight}
-- Taille : ${height}
-- Sport : ${sport}
-- Conditions médicales : ${conditions}
-- Symptômes : ${symptoms}
-
-Tâche :
-Génère un diagnostic précis et détaillé basé sur les informations ci-dessus. Fournis le rationnel du diagnostic, la probabilité estimée de chaque diagnostic possible, et recommande les tests de kinésithérapie ou autres examens médicaux nécessaires pour affiner ce diagnostic.
+  Patient:
+  - Genre : ${gender}
+  - Âge : ${age}
+  - Poids : ${weight}
+  - Taille : ${height}
+  - Sport : ${sport}
+  - Conditions médicales : ${conditions}
+  - Symptômes : ${symptoms}
+  
+  Tâche :
+  Génère un diagnostic précis et détaillé basé sur les informations ci-dessus. Fournis le rationnel du diagnostic, la probabilité estimée de chaque diagnostic possible, et recommande les tests de kinésithérapie ou autres examens médicaux nécessaires pour affiner ce diagnostic.
                 `,
               },
             ],
           }),
         });
-
+  
         const data = await response.json();
-
+  
+        console.log('Réponse du diagnostic backend :', data);
+  
         if (data && data.content) {
           const diagnosisText = data.content.trim();
           diagnosisResult.innerHTML = formatDiagnosisText(diagnosisText);
-          generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
           showConfirmation("Diagnostic généré avec succès");
+  
+          // Générer le plan de traitement après avoir reçu le diagnostic
+          generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
         } else {
           throw new Error("Réponse inattendue de l'API.");
         }
@@ -685,7 +699,7 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
         loader.style.display = "none";
       }
     }
-
+  
     // Fonction pour formater le texte du diagnostic avec des titres gras
     function formatDiagnosisText(text) {
       const lines = text.split('\n').map(line => {
@@ -696,12 +710,39 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
       }).join('<br>');
       return lines;
     }
-
+  
     // Génération du plan de traitement
     async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
       const treatmentPlan = document.getElementById("treatmentPlan");
       treatmentPlan.innerHTML = "Création du plan de traitement en cours...";
-
+  
+      // Log des données envoyées pour le plan de traitement
+      console.log('Données envoyées pour le plan de traitement :', {
+        model: "claude-3-5-sonnet-20241022",
+        gender,
+        age,
+        weight,
+        height,
+        sport,
+        conditions,
+        symptoms,
+        diagnostic,
+        messages: [
+          {
+            role: "user",
+            content: `
+  - Genre : ${gender}
+  - Âge : ${age}
+  - Poids : ${weight}
+  - Taille : ${height}
+  - Sport : ${sport}
+  - Conditions médicales spécifiques : ${conditions}
+  - Symptômes : ${symptoms}
+            `,
+          },
+        ],
+      });
+  
       try {
         const response = await fetch("/.netlify/functions/treatmentPlan", {
           method: "POST",
@@ -710,32 +751,35 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 5000, // Réduction des tokens pour éviter les surcharges
+            gender: gender,
+            age: age,
+            weight: weight,
+            height: height,
+            sport: sport,
+            conditions: conditions,
+            symptoms: symptoms,
+            diagnostic: diagnosis, // Inclure le diagnostic
             messages: [
               {
                 role: "user",
                 content: `
-Patient:
-- Genre : ${gender}
-- Âge : ${age}
-- Poids : ${weight}
-- Taille : ${height}
-- Sport : ${sport}
-- Conditions médicales spécifiques : ${conditions}
-- Symptômes : ${symptoms}
-
-Diagnostic : ${diagnosis}
-
-Tâche :
-Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ce protocole doit être basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. **Ne donnez pas de diagnostic.** Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
+  - Genre : ${gender}
+  - Âge : ${age}
+  - Poids : ${weight}
+  - Taille : ${height}
+  - Sport : ${sport}
+  - Conditions médicales spécifiques : ${conditions}
+  - Symptômes : ${symptoms}
                 `,
               },
             ],
           }),
         });
-
+  
         const data = await response.json();
-
+  
+        console.log('Réponse du plan de traitement backend :', data);
+  
         if (data && data.content) {
           const treatmentText = data.content.trim();
           treatmentPlan.innerHTML = formatTreatmentPlan(treatmentText);
@@ -748,7 +792,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
         console.error("Erreur complète :", error);
       }
     }
-
+  
     // Fonction pour formater le plan de traitement avec une structure bien définie
     function formatTreatmentPlan(text) {
       // Remplacer les sections par des balises appropriées et formatage du texte
@@ -758,16 +802,16 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
         .replace(/\n/g, '<br>');
       return formattedText;
     }
-
+  
     // Téléchargement du plan de traitement en PDF
     async function downloadTreatmentPlanPDF() {
       const { jsPDF } = window.jspdf;
       const treatmentPlanElement = document.getElementById('treatmentPlan');
-
+  
       try {
         // Initialisation de jsPDF
         const pdf = new jsPDF();
-
+  
         // Configuration initiale du PDF
         pdf.setFontSize(16);
         pdf.setFont('helvetica', 'bold');
@@ -775,7 +819,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
         pdf.setFontSize(12);
         const currentDate = new Date().toLocaleDateString('fr-FR');
         pdf.text(`Date de génération: ${currentDate}`, 10, 30);
-
+  
         // Ajout du contenu du plan de traitement
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(12);
@@ -789,7 +833,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
           pdf.text(line, 10, y);
           y += 10;
         });
-
+  
         // Sauvegarde du PDF
         pdf.save("Plan_de_Traitement.pdf");
         showConfirmation("Plan de traitement téléchargé avec succès");
@@ -799,6 +843,3 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       }
     }
   </script>
-</body>
-
-</html>
