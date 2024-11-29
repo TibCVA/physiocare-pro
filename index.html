@@ -86,7 +86,8 @@
       margin: 0;
       font-weight: 600;
       text-align: center;
-      color: #1A1A1A; /* Couleur légèrement plus foncée */
+      color: white; /* Titre en blanc */
+      flex-grow: 1;
     }
 
     /* Style de la navigation */
@@ -117,6 +118,7 @@
       transition: color 0.3s ease, background-color 0.3s ease;
       position: relative;
       border-radius: var(--border-radius);
+      width: 70px;
     }
 
     nav button.active {
@@ -164,6 +166,7 @@
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -339,10 +342,13 @@
         opacity: 0;
         transform: translateY(-20px);
       }
-      10%, 90% {
+
+      10%,
+      90% {
         opacity: 1;
         transform: translateY(0);
       }
+
       100% {
         opacity: 0;
         transform: translateY(-20px);
@@ -371,6 +377,35 @@
       font-size: 12px;
       color: #999;
       padding: 10px 0;
+      position: fixed;
+      bottom: 50px; /* Positionner au-dessus de la barre de navigation */
+      width: 100%;
+      background: var(--background-color);
+      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Cards pour les phases de traitement */
+    .phase-card {
+      background: #F9FAFB;
+      border: 1px solid #E0E0E0;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .phase-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+
+    .phase-card ul {
+      padding-left: 20px;
+      margin: 0;
+      list-style-type: disc;
+      line-height: 1.5;
     }
 
     /* Responsive */
@@ -609,7 +644,7 @@
       const diagnosisResult = document.getElementById("diagnosisResult");
       const loader = document.getElementById("loader");
 
-      diagnosisResult.textContent = "";
+      diagnosisResult.innerHTML = "";
       loader.style.display = "flex";
 
       try {
@@ -663,7 +698,7 @@
     // Génération du plan de traitement
     async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
       const treatmentPlan = document.getElementById("treatmentPlan");
-      treatmentPlan.textContent = "Création du plan de traitement en cours...";
+      treatmentPlan.innerHTML = "Création du plan de traitement en cours...";
 
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
@@ -678,18 +713,18 @@
               {
                 role: "user",
                 content: `
-    Patient:
-    - Genre: ${gender}
-    - Âge: ${age}
-    - Poids: ${weight}
-    - Taille: ${height}
-    - Sport: ${sport}
-    - Conditions médicales spécifiques: ${conditions}
-    - Symptômes: ${symptoms}
-    
-    Diagnostic: ${diagnosis}
-    
-    Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+Patient:
+- Genre: ${gender}
+- Âge: ${age}
+- Poids: ${weight}
+- Taille: ${height}
+- Sport: ${sport}
+- Conditions médicales spécifiques: ${conditions}
+- Symptômes: ${symptoms}
+
+Diagnostic: ${diagnosis}
+
+Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
               },
             ],
           }),
@@ -710,13 +745,13 @@
       }
     }
 
-    // Fonction pour formater le plan de traitement avec titres numérotés et icônes
+    // Fonction pour formater le plan de traitement avec cartes et listes à puces
     function formatTreatmentPlan(text) {
       const phases = text.split('\n').filter(line => line.trim() !== '');
       let formatted = '';
       phases.forEach((line, index) => {
         formatted += `
-          <div class="phase">
+          <div class="phase-card">
             <h3>Phase ${index + 1}</h3>
             <ul>
               <li>${line.replace(/^\*\*/, '').replace(/\*\*$/, '')}</li>
@@ -730,21 +765,41 @@
     // Téléchargement du plan de traitement en PDF
     function downloadTreatmentPlanPDF() {
       const { jsPDF } = window.jspdf;
-      const treatmentPlanContent = document.getElementById('treatmentPlan').innerText;
+      const treatmentPlanContent = document.getElementById('treatmentPlan').innerHTML;
 
       const doc = new jsPDF();
-      // Ajout de l'en-tête avec le logo
+      // Ajout de l'en-tête avec le logo et le titre
       const img = new Image();
       img.src = 'logo.png';
       img.onload = function () {
         doc.addImage(img, 'PNG', 10, 10, 30, 30);
-        doc.setFontSize(18);
-        doc.text("Plan de Traitement Personnalisé", 50, 20);
+        doc.setFontSize(17);
+        doc.setFont('SF Pro Display', 'bold');
+        doc.text("Plan de Traitement Personnalisé", 50, 25);
         doc.setFontSize(12);
+        doc.setFont('SF Pro Display', 'normal');
         doc.setTextColor('#1A1A1A');
-        doc.text(treatmentPlanContent, 10, 40, { maxWidth: 190 });
-        doc.save("Plan_de_Traitement.pdf");
-        showConfirmation("Plan de traitement téléchargé avec succès");
+
+        // Ajout de la date de génération
+        const currentDate = new Date().toLocaleDateString('fr-FR');
+        doc.text(`Date de génération: ${currentDate}`, 150, 25);
+
+        // Bandeau bleu clair sous l'en-tête
+        doc.setFillColor('#E8F4FB');
+        doc.rect(10, 30, 190, 5, 'F');
+
+        // Ajout du contenu du plan de traitement
+        // Utilisation de HTML to Canvas pour une meilleure mise en page
+        doc.html(document.getElementById('treatmentPlan'), {
+          callback: function (doc) {
+            doc.save("Plan_de_Traitement.pdf");
+            showConfirmation("Plan de traitement téléchargé avec succès");
+          },
+          x: 10,
+          y: 40,
+          width: 190, // Largeur maximale pour éviter le débordement
+          windowWidth: 600 // Correspond à la largeur de l'app
+        });
       };
     }
   </script>
