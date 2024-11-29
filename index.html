@@ -12,8 +12,6 @@
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Inclusion de l'éditeur de texte enrichi Quill -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <style>
     /* Variables CSS pour les couleurs */
     :root {
@@ -37,6 +35,13 @@
       --upload-bg: #FAFAFA;
       --alert-warning-bg: #FFF9E0;
       --alert-warning-text: #1A1A1A;
+      --header-height: 60px;
+      --header-padding: 0 20px;
+      --logo-size: 50px;
+      --title-size: 22pt;
+      --button-height: 50px;
+      --button-font-size: 18px;
+      --button-padding: 0 16px;
     }
 
     /* Styles globaux */
@@ -54,40 +59,44 @@
 
     /* Style du header */
     header {
-      background: var(--primary-color);
+      background: linear-gradient(135deg, #005F9E, #0073E6);
       color: white;
       width: 100%;
-      height: 44px;
-      padding: 0 20px;
+      height: var(--header-height);
+      padding: var(--header-padding);
       position: fixed;
       top: 0;
       z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     @media (max-width: 600px) {
       header {
-        height: 88px; /* Pour les écrans avec encoche */
-        padding-top: 24px;
+        height: 80px; /* Pour les écrans avec encoche */
+        padding-top: 20px;
       }
     }
 
     header img {
-      width: 40px; /* Logo plus gros */
+      width: var(--logo-size);
+      height: var(--logo-size);
       border-radius: var(--border-radius);
       margin-right: 12px;
+      object-fit: contain;
     }
 
     header h1 {
-      font-size: 20pt; /* Titre légèrement plus gros */
+      font-size: var(--title-size); /* Taille légèrement plus grosse */
       margin: 0;
       font-weight: 600;
       text-align: center;
       color: white; /* Titre en blanc */
-      flex-grow: 1;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     /* Style de la navigation */
@@ -119,6 +128,7 @@
       position: relative;
       border-radius: var(--border-radius);
       width: 70px;
+      height: 100%;
     }
 
     nav button.active {
@@ -227,17 +237,17 @@
     /* Boutons */
     .primary-btn {
       width: 100%;
-      height: 48px;
-      padding: 0 16px;
+      height: var(--button-height);
+      padding: var(--button-padding);
       background-color: var(--primary-color);
       color: #fff;
       border: none;
       border-radius: var(--border-radius);
-      font-size: 16px;
+      font-size: var(--button-font-size);
       font-weight: 700;
       cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.1s ease;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -245,17 +255,19 @@
 
     .primary-btn:hover {
       background-color: var(--button-hover-color);
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
     }
 
     .primary-btn:active {
       background-color: var(--button-active-color);
       transform: scale(0.98);
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .download-btn {
       background-color: var(--button-download-color);
       margin-top: var(--section-margin);
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .download-btn i {
@@ -276,7 +288,7 @@
     .result {
       background: var(--light-gray);
       padding: var(--section-padding);
-      border-radius: var(--border-radius);
+      border-radius: 20px;
       margin-top: 16px;
       white-space: pre-wrap;
       font-size: 16px;
@@ -378,7 +390,7 @@
       color: #999;
       padding: 10px 0;
       position: fixed;
-      bottom: 50px; /* Positionner au-dessus de la barre de navigation */
+      bottom: 60px; /* Positionner au-dessus de la barre de navigation */
       width: 100%;
       background: var(--background-color);
       box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
@@ -411,12 +423,12 @@
     /* Responsive */
     @media (max-width: 600px) {
       header {
-        height: 88px; /* Pour les écrans avec encoche */
-        padding-top: 24px;
+        height: 80px; /* Pour les écrans avec encoche */
+        padding-top: 20px;
       }
 
       header h1 {
-        font-size: 20pt;
+        font-size: 22pt; /* Ajustement pour une meilleure lisibilité */
       }
 
       h2 {
@@ -424,7 +436,7 @@
       }
 
       .primary-btn {
-        font-size: 14px;
+        font-size: 18px; /* Texte plus gros */
       }
 
       nav button i {
@@ -550,7 +562,7 @@
   <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
-    <div class="result" id="treatmentPlan">
+    <div class="result treatment-plan" id="treatmentPlan">
       En attente du diagnostic pour générer le plan de traitement...
     </div>
     <button class="primary-btn download-btn" onclick="downloadTreatmentPlanPDF()">
@@ -760,8 +772,8 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
 
     // Fonction pour formater le plan de traitement avec une structure bien définie
     function formatTreatmentPlan(text) {
-      // Supposons que le texte reçu est déjà bien structuré, on peut le formater en HTML
-      // Ici, nous remplaçons les titres par des balises appropriées et les listes
+      // Ici, nous remplaçons les sections par des balises appropriées et formatons le texte
+      // Exemple de format : des titres en gras et des listes à puces pour les exercices et soins
       const formattedText = text.replace(/Exercice/g, '<strong>Exercice</strong>')
                                 .replace(/Soins/g, '<strong>Soins</strong>')
                                 .replace(/\n/g, '<br>');
@@ -782,29 +794,28 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
         doc.addImage(img, 'PNG', 10, 10, 30, 30);
         doc.setFontSize(17);
         doc.setFont('SF Pro Display', 'bold');
-        doc.text("Plan de Traitement Personnalisé", 50, 20);
+        doc.text("Plan de Traitement Personnalisé", 50, 25);
         doc.setFontSize(12);
         doc.setFont('SF Pro Display', 'normal');
         doc.setTextColor('#1A1A1A');
 
         // Ajout de la date de génération
         const currentDate = new Date().toLocaleDateString('fr-FR');
-        doc.text(`Date de génération: ${currentDate}`, 150, 20);
+        doc.text(`Date de génération: ${currentDate}`, 150, 25);
 
         // Bandeau bleu clair sous l'en-tête
         doc.setFillColor('#E8F4FB');
-        doc.rect(10, 25, 190, 5, 'F');
+        doc.rect(10, 30, 190, 5, 'F');
 
         // Ajout du contenu du plan de traitement
-        // Utilisation de html2canvas ou une méthode alternative pour convertir HTML en PDF
-        // Ici, nous utilisons la méthode html() de jsPDF pour une simplicité
+        // Utilisation de la méthode html() de jsPDF pour convertir le contenu HTML structuré en PDF
         doc.html(document.getElementById('treatmentPlan'), {
           callback: function (doc) {
             doc.save("Plan_de_Traitement.pdf");
             showConfirmation("Plan de traitement téléchargé avec succès");
           },
           x: 10,
-          y: 30,
+          y: 40,
           width: 190, // Largeur maximale pour éviter le débordement
           windowWidth: 600 // Correspond à la largeur de l'app
         });
