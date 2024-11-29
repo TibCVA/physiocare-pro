@@ -646,7 +646,7 @@
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 2000, // Réduction des tokens pour éviter les surcharges
+            max_tokens: 5000, // Réduction des tokens pour éviter les surcharges
             messages: [
               {
                 role: "user",
@@ -703,14 +703,14 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
       treatmentPlan.innerHTML = "Création du plan de traitement en cours...";
 
       try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
+        const response = await fetch("/.netlify/functions/treatmentPlan", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 2000, // Réduction des tokens pour éviter les surcharges
+            max_tokens: 5000, // Réduction des tokens pour éviter les surcharges
             messages: [
               {
                 role: "user",
