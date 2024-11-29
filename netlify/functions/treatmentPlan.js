@@ -66,7 +66,7 @@ Générez un plan de traitement personnalisé incluant des exercices avec fréqu
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000, // Réduction à 1000
+        max_tokens: 5000, // Réduction à 1000
         messages: [
           {
             role: 'user',
