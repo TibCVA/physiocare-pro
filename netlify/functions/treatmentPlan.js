@@ -57,13 +57,6 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
 
     console.log('Prompt envoyé à Claude :', prompt);
 
-    // Ajouter un timeout pour éviter que la fonction ne reste bloquée
-    const controller = new AbortController();
-    const timeout = setTimeout(() => {
-      controller.abort();
-      console.error('L\'appel à l\'API Claude a été abandonné en raison du timeout.');
-    }, 9000); // 9 secondes, juste en dessous du timeout de 10 secondes
-
     // Appel à l'API Claude pour le plan de traitement
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -74,18 +67,15 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000, // Réduction supplémentaire pour accélérer la réponse
+        max_tokens: 5000, // Vous pouvez envisager de réduire cette valeur si nécessaire
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ]
-      }),
-      signal: controller.signal
+      })
     });
-
-    clearTimeout(timeout);
 
     console.log('Après l\'appel à l\'API Claude');
 
