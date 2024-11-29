@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <!-- Importation des polices -->
-  <link rel="preconnect" href=https://fonts.googleapis.com>
-  <link href=https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
   <!-- Importation de Font Awesome pour les icônes -->
-  <link rel="stylesheet" href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/1.5.1/3Dmol.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
   <style>
     /* Variables CSS pour les couleurs */
     :root {
@@ -56,8 +54,8 @@
     }
 
     header img {
-      width: 40px;
-      margin-right: 10px;
+      width: 30px;
+      margin-right: 8px;
       border-radius: 50%;
     }
 
@@ -180,21 +178,11 @@
       margin-top: 20px;
       font-weight: 500;
       transition: background-color 0.3s ease, transform 0.2s ease;
-      animation: pulse 1.5s infinite;
     }
 
     button.primary-btn:hover {
       background-color: #218838;
       transform: translateY(-3px);
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.02);
-      }
     }
 
     /* Style des résultats */
@@ -207,15 +195,6 @@
       font-size: 16px;
       font-family: 'Roboto Mono', monospace;
       border: 1px solid var(--secondary-color);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    #humanModelContainer {
-      margin-top: 20px;
-      width: 100%;
-      height: 300px;
-      background-color: #f0f0f0;
-      border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -232,31 +211,11 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .result ul li::before {
-      content: "\f00c";
-      font-family: 'Font Awesome 5 Free';
-      font-weight: 900;
-      color: var(--accent-color);
-      margin-right: 10px;
-    }
-
-    .download-btn {
+    /* Canvas pour le modèle 3D */
+    #model3D {
       width: 100%;
-      padding: 15px;
-      background-color: var(--secondary-color);
-      color: white;
-      border: none;
-      border-radius: 15px;
-      font-size: 16px;
-      cursor: pointer;
+      height: 400px;
       margin-top: 20px;
-      font-weight: 500;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .download-btn:hover {
-      background-color: #0056b3;
-      transform: translateY(-3px);
     }
 
     /* Responsive */
@@ -330,12 +289,6 @@
       <option value="Régulière">Régulière</option>
       <option value="Professionnelle">Professionnelle</option>
     </select>
-    <span class="tooltip">i
-      <span class="tooltiptext">Une activité sportive professionnelle implique un entraînement régulier, intense et compétitif.</span>
-    </span>
-
-    <label for="conditions">Conditions Médicales Spécifiques :</label>
-    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
   </div>
 
   <!-- Étape 2 : Symptômes -->
@@ -353,7 +306,7 @@
     <h2>Diagnostic</h2>
     <button class="primary-btn" onclick="confirmGenerateDiagnosis()">Obtenir le Diagnostic</button>
     <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
-    <div id="humanModelContainer"></div>
+    <div id="model3D"></div>
     <div id="loader" style="display: none;">
       <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i> Analyse en cours...
     </div>
@@ -365,10 +318,13 @@
     <div id="treatmentPlan" class="result">
       En attente du diagnostic pour générer le plan de traitement...
     </div>
-    <button class="download-btn" onclick="downloadTreatmentPlan()">Télécharger le Plan de Traitement en PDF</button>
+    <button class="primary-btn" onclick="downloadTreatmentPlanPDF()">Télécharger le Plan de Traitement en PDF</button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script>
+    // Navigation
     function showStep(step) {
       const steps = document.querySelectorAll('.container');
       const buttons = document.querySelectorAll('nav button');
@@ -382,23 +338,50 @@
       });
     }
 
+    // Confirmation et génération du diagnostic
     function confirmGenerateDiagnosis() {
       if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
         generateDiagnosis();
       }
     }
 
+    // Fonction d'intégration du modèle 3D
+    function load3DModel() {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth * 0.9, 400);
+      document.getElementById("model3D").appendChild(renderer.domElement);
+
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    // Charger le modèle 3D au début
+    window.onload = () => load3DModel();
+
+    // Génération du diagnostic
     async function generateDiagnosis() {
       const gender = document.getElementById("gender").value;
       const age = document.getElementById("age").value;
       const weight = document.getElementById("weight").value;
       const height = document.getElementById("height").value;
       const sport = document.getElementById("sport").value;
-      const conditions = document.getElementById("conditions").value;
+      const conditions = document.getElementById("conditions").value || 'Aucune';
       const symptoms = document.getElementById("symptoms").value;
+
       const diagnosisResult = document.getElementById("diagnosisResult");
       const loader = document.getElementById("loader");
-      const humanModelContainer = document.getElementById("humanModelContainer");
 
       diagnosisResult.textContent = "";
       loader.style.display = "block";
@@ -425,9 +408,6 @@
         const diagnosisText = data.content.trim();
         diagnosisResult.textContent = diagnosisText;
 
-        // Code pour mettre à jour le modèle 3D basé sur le diagnostic
-        update3DModel(symptoms);
-
         generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
       } catch (error) {
         diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
@@ -437,29 +417,7 @@
       }
     }
 
-    function update3DModel(symptoms) {
-      // Logique pour mettre en évidence les parties affectées sur le modèle 3D
-      const container = document.getElementById('humanModelContainer');
-      container.innerHTML = ""; // Réinitialiser le modèle précédent
-      // Exemple d'intégration d'un modèle 3D simplifié
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      const cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-      camera.position.z = 5;
-      function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-      }
-      animate();
-      // Plus tard, inclure la logique pour colorier les parties spécifiques en rouge selon les symptômes reçus.
-    }
-
+    // Génération du plan de traitement
     async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
       const treatmentPlan = document.getElementById("treatmentPlan");
       treatmentPlan.textContent = "Création du plan de traitement en cours...";
@@ -502,14 +460,18 @@ Tâche : Basé sur les informations ci-dessus, générez une **proposition théo
       }
     }
 
-    function downloadTreatmentPlan() {
-      const treatmentPlanContent = document.getElementById("treatmentPlan").textContent;
-      const pdfContent = `PhysioCare Pro\n\nPlan de Traitement:\n\n${treatmentPlanContent}`;
-      const blob = new Blob([pdfContent], { type: "application/pdf" });
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = "Plan_Traitement.pdf";
-      link.click();
+    // Téléchargement du plan de traitement en PDF
+    function downloadTreatmentPlanPDF() {
+      const { jsPDF } = window.jspdf;
+      const treatmentPlanText = document.getElementById('treatmentPlan').innerText;
+
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text("Plan de Traitement Personnalisé", 10, 10);
+      doc.setFontSize(12);
+      doc.text(treatmentPlanText, 10, 20);
+
+      doc.save("Plan_de_Traitement.pdf");
     }
   </script>
 </body>
