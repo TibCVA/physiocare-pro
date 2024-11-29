@@ -57,6 +57,13 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
 
     console.log('Prompt envoyé à Claude :', prompt);
 
+    // Ajouter un timeout pour éviter que la fonction ne reste bloquée
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+      console.error('L\'appel à l\'API Claude a été abandonné en raison du timeout.');
+    }, 9000); // 9 secondes, juste en dessous du timeout de 10 secondes
+
     // Appel à l'API Claude pour le plan de traitement
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -67,15 +74,20 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2000, // Réduction pour éviter les surcharges
+        max_tokens: 1000, // Réduction supplémentaire pour accélérer la réponse
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ]
-      })
+      }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeout);
+
+    console.log('Après l\'appel à l\'API Claude');
 
     if (!claudeResponse.ok) {
       const errorText = await claudeResponse.text();
@@ -95,6 +107,8 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       console.error('La réponse de Claude est mal formée ou vide.', claudeData);
       throw new Error('Pas de plan de traitement disponible.');
     }
+
+    console.log('Plan de traitement généré :', treatmentPlan);
 
     // Retour du plan de traitement
     return {
