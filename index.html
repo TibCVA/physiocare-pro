@@ -12,6 +12,8 @@
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Importation de html2canvas pour la capture du contenu HTML -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNa+ZcV8IwAs5GrwS/gUfyXJJyRFE/l0YlUBKxphDA/WVBRPCs9MyA53nOFibpAnT4r1Ed3qVbIMk81XcYmwVA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     /* Variables CSS pour les couleurs */
     :root {
@@ -72,6 +74,7 @@
       align-items: center;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       background-image: linear-gradient(135deg, #005F9E, #0073E6);
+      border-bottom: 1px solid #00477C;
     }
 
     @media (max-width: 600px) {
@@ -395,6 +398,7 @@
       width: 100%;
       background: var(--background-color);
       box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 998;
     }
 
     /* Responsive */
@@ -725,7 +729,7 @@ Patient:
 Diagnostic : ${diagnosis}
 
 Tâche :
-Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, leur **durée**, **intensité** et **fréquence**, ainsi que des **soins spécifiques** à réaliser.
+Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
                 `,
               },
             ],
@@ -749,7 +753,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
 
     // Fonction pour formater le plan de traitement avec une structure bien définie
     function formatTreatmentPlan(text) {
-      // Ici, nous remplaçons les sections par des balises appropriées et formatons le texte
+      // Remplacer les sections par des balises appropriées et formatage du texte
       // Exemple de format : des titres en gras et des listes à puces pour les exercices et soins
       const formattedText = text.replace(/Exercice/g, '<strong>Exercice</strong>')
         .replace(/Soins/g, '<strong>Soins</strong>')
@@ -760,42 +764,52 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
     // Téléchargement du plan de traitement en PDF
     async function downloadTreatmentPlanPDF() {
       const { jsPDF } = window.jspdf;
-      const treatmentPlanContent = document.getElementById('treatmentPlan').innerHTML;
+      const treatmentPlanElement = document.getElementById('treatmentPlan');
 
-      const doc = new jsPDF();
+      try {
+        // Utilisation de html2canvas pour capturer le contenu HTML
+        const canvas = await html2canvas(treatmentPlanElement, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
 
-      // Ajout de l'en-tête avec le logo, le titre et la date
-      const img = new Image();
-      img.src = 'logo.png';
-      img.onload = async function () {
-        doc.addImage(img, 'PNG', 10, 10, 30, 30);
-        doc.setFontSize(17);
-        doc.setFont('helvetica', 'bold');
-        doc.text("Plan de Traitement Personnalisé", 50, 20);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor('#1A1A1A');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-        // Ajout de la date de génération
+        // Ajout de l'image capturée au PDF
+        pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
+
+        // Ajout du logo, titre et date en haut du PDF
+        const img = new Image();
+        img.src = 'logo.png';
+        img.crossOrigin = 'anonymous';
+        await new Promise((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject("Erreur lors du chargement du logo.");
+        });
+
+        pdf.addImage(img, 'PNG', 10, 10, 20, 20);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Plan de Traitement Personnalisé", 40, 15);
+        pdf.setFontSize(12);
         const currentDate = new Date().toLocaleDateString('fr-FR');
-        doc.text(`Date de génération: ${currentDate}`, 150, 20);
+        pdf.text(`Date de génération: ${currentDate}`, pdfWidth - 60, 15);
 
         // Bandeau bleu clair sous l'en-tête
-        doc.setFillColor('#E8F4FB');
-        doc.rect(10, 25, 190, 5, 'F');
+        pdf.setFillColor('#E8F4FB');
+        pdf.rect(10, 22, pdfWidth - 20, 5, 'F');
 
-        // Ajout du contenu du plan de traitement
-        await doc.html(document.getElementById('treatmentPlan'), {
-          callback: function (doc) {
-            doc.save("Plan_de_Traitement.pdf");
-            showConfirmation("Plan de traitement téléchargé avec succès");
-          },
-          x: 10,
-          y: 35,
-          width: 190, // Largeur maximale pour éviter le débordement
-          windowWidth: 600 // Correspond à la largeur de l'app
-        });
-      };
+        // Ajout du contenu capturé
+        pdf.addImage(imgData, 'PNG', 10, 30, pdfWidth - 20, pdfHeight - 30);
+
+        // Sauvegarde du PDF
+        pdf.save("Plan_de_Traitement.pdf");
+        showConfirmation("Plan de traitement téléchargé avec succès");
+      } catch (error) {
+        console.error("Erreur lors de la génération du PDF :", error);
+        showConfirmation("Erreur lors du téléchargement du plan de traitement.");
+      }
     }
   </script>
 </body>
