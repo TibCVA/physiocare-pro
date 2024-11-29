@@ -23,23 +23,20 @@ exports.handler = async (event) => {
       );
     }
 
+    console.log('Appel à l\'API Claude...');
+
     // Appel à l'API Claude
-    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/complete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
         'x-api-key': process.env.ANTHROPIC_API_KEY
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000,
-        messages: [
-          {
-            role: 'user',
-            content: `Donnez un diagnostic concis basé sur les symptômes suivants. Répondez uniquement en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements. Voici les symptômes : "${requestData.messages[0].content}".`
-          }
-        ]
+        model: requestData.model,
+        prompt: requestData.messages[0].content,
+        max_tokens_to_sample: requestData.max_tokens || 1000,
+        stop_sequences: ['\n\nHuman:']
       })
     });
 
@@ -52,15 +49,7 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse complète :', claudeData);
 
-    // Vérification renforcée de la réponse
-    console.log('Vérification de la réponse Claude :', claudeData.content);
-    console.log('Premier élément de content :', claudeData.content?.[0]);
-    console.log('Texte du diagnostic :', claudeData.content?.[0]?.text);
-
-    const diagnosis =
-      claudeData.content &&
-      Array.isArray(claudeData.content) &&
-      claudeData.content[0]?.text?.trim();
+    const diagnosis = claudeData.completion?.trim();
 
     if (!diagnosis) {
       console.error('La réponse Claude est mal formée ou vide.', claudeData);
@@ -89,11 +78,7 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         error: error.message || 'Erreur serveur interne.',
-        content: [
-          {
-            text: "Une erreur est survenue lors du traitement de la requête."
-          }
-        ]
+        content: "Une erreur est survenue lors du traitement de la requête."
       })
     };
   }
