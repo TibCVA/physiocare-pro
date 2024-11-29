@@ -525,6 +525,10 @@
       </label>
       <div id="filePreview"></div>
     </div>
+
+    <button class="primary-btn" onclick="uploadFiles()">
+      Télécharger et Analyser les Fichiers
+    </button>
   </div>
 
   <!-- Étape 3 : Diagnostic -->
@@ -862,6 +866,38 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
       } catch (error) {
         console.error("Erreur lors de la génération du PDF :", error);
         showConfirmation("Erreur lors du téléchargement du plan de traitement.");
+      }
+    }
+
+    // Fonction pour envoyer les fichiers au backend et analyser le texte
+    async function uploadFiles() {
+      const fileInput = document.getElementById('fileInput');
+      const files = fileInput.files;
+      const formData = new FormData();
+
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+
+      try {
+        const response = await fetch('/.netlify/functions/uploadFiles', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showConfirmation("Fichiers analysés avec succès");
+          // Intégrer les résultats de l'analyse dans le diagnostic
+          const diagnosisResult = document.getElementById("diagnosisResult");
+          diagnosisResult.innerHTML = data.content;
+        } else {
+          showConfirmation("Erreur lors de l'analyse des fichiers");
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des fichiers:", error);
+        showConfirmation("Erreur lors du chargement des fichiers");
       }
     }
   </script>
