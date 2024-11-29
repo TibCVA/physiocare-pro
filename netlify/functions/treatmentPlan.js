@@ -11,8 +11,8 @@ exports.handler = async (event) => {
   try {
     const requestData = JSON.parse(event.body);
 
-    // Définir les champs requis
-    const requiredFields = ['model', 'gender', 'age', 'weight', 'height', 'sport', 'conditions', 'symptoms', 'diagnostic', 'messages'];
+    // Définir les champs requis sauf 'conditions'
+    const requiredFields = ['model', 'gender', 'age', 'weight', 'height', 'sport', 'symptoms', 'diagnostic', 'messages'];
 
     // Identifier les champs manquants
     const missingFields = requiredFields.filter(field => !requestData[field]);
@@ -24,14 +24,11 @@ exports.handler = async (event) => {
       );
     }
 
-    // Vérifier que 'messages' est un tableau avec au moins un élément contenant 'content'
-    if (
-      !Array.isArray(requestData.messages) ||
-      !requestData.messages[0]?.content
-    ) {
-      console.error('Le champ "messages" est invalide ou vide.');
+    // 'conditions' peut être vide, mais vérifier qu'il existe
+    if (typeof requestData.conditions === 'undefined') {
+      console.error('Le champ "conditions" est absent.');
       throw new Error(
-        'Données d’entrée invalides. Assurez-vous de fournir un tableau "messages" avec au moins un objet contenant "content".'
+        'Données d’entrée invalides. Le champ "conditions" est requis.'
       );
     }
 
@@ -52,7 +49,7 @@ Patient:
 Diagnostic : ${requestData.diagnostic}
 
 Tâche :
-Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ce protocole doit être basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. **Ne donnez pas de diagnostic.** Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, ainsi que des **soins spécifiques** à réaliser.
+Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ce protocole doit être basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. **Ne donnez pas de diagnostic.** Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
     `;
 
     console.log('Prompt envoyé à Claude :', prompt);
@@ -67,7 +64,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1000, // Vous pouvez envisager de réduire cette valeur si nécessaire
+        max_tokens: 1500, // Réduction à 1500
         messages: [
           {
             role: 'user',
