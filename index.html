@@ -12,8 +12,8 @@
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Importation de html2canvas pour la capture du contenu HTML -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNa+ZcV8IwAs5GrwS/gUfyXJJyRFE/l0YlUBKxphDA/WVBRPCs9MyA53nOFibpAnT4r1Ed3qVbIMk81XcYmwVA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Importation de jsPDF pour la génération du PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <style>
     /* Variables CSS pour les couleurs */
     :root {
@@ -557,7 +557,6 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script>
     // Prévisualisation des fichiers téléchargés
     const fileInput = document.getElementById('fileInput');
@@ -729,7 +728,7 @@ Patient:
 Diagnostic : ${diagnosis}
 
 Tâche :
-Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
+Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
                 `,
               },
             ],
@@ -767,44 +766,30 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       const treatmentPlanElement = document.getElementById('treatmentPlan');
 
       try {
-        // Utilisation de html2canvas pour capturer le contenu HTML
-        const canvas = await html2canvas(treatmentPlanElement, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
+        // Initialisation de jsPDF
+        const pdf = new jsPDF();
 
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        // Ajout de l'en-tête avec le logo, le titre et la date
-        const imgLogo = new Image();
-        imgLogo.src = 'logo.png';
-        imgLogo.crossOrigin = 'anonymous';
-        await new Promise((resolve, reject) => {
-          imgLogo.onload = resolve;
-          imgLogo.onerror = () => reject("Erreur lors du chargement du logo.");
-        });
-
-        const logoWidth = 30;
-        const logoHeight = 30;
-        pdf.addImage(imgLogo, 'PNG', 10, 10, logoWidth, logoHeight);
+        // Configuration initiale du PDF
         pdf.setFontSize(16);
         pdf.setFont('helvetica', 'bold');
-        pdf.text("Plan de Traitement Personnalisé", 50, 20);
+        pdf.text("Plan de Traitement Personnalisé", 10, 20);
         pdf.setFontSize(12);
         const currentDate = new Date().toLocaleDateString('fr-FR');
-        pdf.text(`Date de génération: ${currentDate}`, pdfWidth - 60, 20);
+        pdf.text(`Date de génération: ${currentDate}`, 10, 30);
 
-        // Bandeau bleu clair sous l'en-tête
-        pdf.setFillColor('#E8F4FB');
-        pdf.rect(10, 25, pdfWidth - 20, 5, 'F');
-
-        // Calcul de la hauteur de l'image capturée
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgWidth = pdfWidth - 20;
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-
-        // Ajout du contenu capturé
-        pdf.addImage(imgData, 'PNG', 10, 30, imgWidth, imgHeight);
+        // Ajout du contenu du plan de traitement
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(12);
+        const lines = treatmentPlanElement.innerText.split('\n');
+        let y = 40;
+        lines.forEach(line => {
+          if (y > 280) { // Limite de la page A4 en mm
+            pdf.addPage();
+            y = 20;
+          }
+          pdf.text(line, 10, y);
+          y += 10;
+        });
 
         // Sauvegarde du PDF
         pdf.save("Plan_de_Traitement.pdf");
