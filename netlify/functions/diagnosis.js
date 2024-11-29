@@ -49,15 +49,14 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse complète :', claudeData);
 
-    // Extraction du contenu de la réponse
-    const diagnosis = claudeData.completion?.trim() || claudeData.content?.trim();
+    const content = claudeData.completion?.trim() || claudeData.messages?.[0]?.content?.trim();
 
-    if (!diagnosis) {
+    if (!content) {
       console.error('La réponse Claude est mal formée ou vide.', claudeData);
-      throw new Error('Pas de diagnostic disponible.');
+      throw new Error('Pas de réponse disponible.');
     }
 
-    // Retour du diagnostic
+    // Retour de la réponse
     return {
       statusCode: 200,
       headers: {
@@ -65,7 +64,7 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        content: diagnosis
+        content: content
       })
     };
   } catch (error) {
