@@ -23,8 +23,6 @@ exports.handler = async (event) => {
       );
     }
 
-    console.log('Appel à l\'API Claude...');
-
     // Appel à l'API Claude
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -34,9 +32,14 @@ exports.handler = async (event) => {
         'x-api-key': process.env.ANTHROPIC_API_KEY
       },
       body: JSON.stringify({
-        model: requestData.model,
-        messages: requestData.messages,
-        max_tokens: requestData.max_tokens || 1000
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1000,
+        messages: [
+          {
+            role: 'user',
+            content: `Donnez un diagnostic concis basé sur les symptômes suivants. Répondez uniquement en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements. Voici les symptômes : "${requestData.messages[0].content}".`
+          }
+        ]
       })
     });
 
@@ -49,19 +52,22 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse complète :', claudeData);
 
-    // Extraction du contenu de la réponse
-    let content = '';
+    // Vérification renforcée de la réponse
+    console.log('Vérification de la réponse Claude :', claudeData.content);
+    console.log('Premier élément de content :', claudeData.content?.[0]);
+    console.log('Texte du diagnostic :', claudeData.content?.[0]?.text);
 
-    if (Array.isArray(claudeData.content) && claudeData.content.length > 0) {
-      content = claudeData.content.map(item => item.text).join('').trim();
-    }
+    const diagnosis =
+      claudeData.content &&
+      Array.isArray(claudeData.content) &&
+      claudeData.content[0]?.text?.trim();
 
-    if (!content) {
+    if (!diagnosis) {
       console.error('La réponse Claude est mal formée ou vide.', claudeData);
-      throw new Error('Pas de réponse disponible.');
+      throw new Error('Pas de diagnostic disponible.');
     }
 
-    // Retour de la réponse
+    // Retour du diagnostic
     return {
       statusCode: 200,
       headers: {
@@ -69,7 +75,7 @@ exports.handler = async (event) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        content: content
+        content: diagnosis
       })
     };
   } catch (error) {
@@ -83,7 +89,11 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         error: error.message || 'Erreur serveur interne.',
-        content: "Une erreur est survenue lors du traitement de la requête."
+        content: [
+          {
+            text: "Une erreur est survenue lors du traitement de la requête."
+          }
+        ]
       })
     };
   }
