@@ -87,10 +87,15 @@ Générez un plan de traitement personnalisé incluant des exercices avec fréqu
     const claudeData = await claudeResponse.json();
     console.log('Réponse complète de Claude :', claudeData);
 
-    const treatmentPlan =
-      claudeData.content &&
-      typeof claudeData.content === 'string' &&
-      claudeData.content.trim();
+    // Traitement de la réponse de Claude
+    let treatmentPlan = '';
+
+    if (Array.isArray(claudeData.content)) {
+      // Concatenation des segments de texte
+      treatmentPlan = claudeData.content.map(part => part.text).join('\n');
+    } else if (typeof claudeData.content === 'string') {
+      treatmentPlan = claudeData.content.trim();
+    }
 
     if (!treatmentPlan) {
       console.error('La réponse de Claude est mal formée ou vide.', claudeData);
