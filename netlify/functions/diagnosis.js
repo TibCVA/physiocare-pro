@@ -26,17 +26,17 @@ exports.handler = async (event) => {
     console.log('Appel à l\'API Claude...');
 
     // Appel à l'API Claude
-    const claudeResponse = await fetch('https://api.anthropic.com/v1/complete', {
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
         'x-api-key': process.env.ANTHROPIC_API_KEY
       },
       body: JSON.stringify({
         model: requestData.model,
-        prompt: requestData.messages[0].content,
-        max_tokens_to_sample: requestData.max_tokens || 1000,
-        stop_sequences: ['\n\nHuman:']
+        messages: requestData.messages,
+        max_tokens: requestData.max_tokens || 1000
       })
     });
 
@@ -49,7 +49,8 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse complète :', claudeData);
 
-    const diagnosis = claudeData.completion?.trim();
+    // Extraction du contenu de la réponse
+    const diagnosis = claudeData.completion?.trim() || claudeData.content?.trim();
 
     if (!diagnosis) {
       console.error('La réponse Claude est mal formée ou vide.', claudeData);
