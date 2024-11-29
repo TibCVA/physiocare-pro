@@ -73,7 +73,6 @@
       display: flex;
       align-items: center;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      background-image: linear-gradient(135deg, #005F9E, #0073E6);
       border-bottom: 1px solid #00477C;
     }
 
@@ -647,7 +646,7 @@
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 10000,
+            max_tokens: 2000, // Réduction des tokens pour éviter les surcharges
             messages: [
               {
                 role: "user",
@@ -711,7 +710,7 @@ Génère un diagnostic précis et détaillé basé sur les informations ci-dessu
           },
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
-            max_tokens: 10000,
+            max_tokens: 2000, // Réduction des tokens pour éviter les surcharges
             messages: [
               {
                 role: "user",
@@ -728,7 +727,7 @@ Patient:
 Diagnostic : ${diagnosis}
 
 Tâche :
-Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
+Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes. Ce protocole doit être basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. **Ne donnez pas de diagnostic.** Précisez que ce protocole doit impérativement être validé par un professionnel de santé avant application. Répondez uniquement sous la forme d'une description structurée avec des **exercices détaillés**, incluant leur **fréquence**, **intensité**, et **positions correctes**, ainsi que des **soins spécifiques** à réaliser.
                 `,
               },
             ],
