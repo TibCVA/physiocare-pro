@@ -198,19 +198,6 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .result ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .result ul li {
-      margin-bottom: 10px;
-      padding: 10px;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
     /* Canvas pour le modèle 3D */
     #model3D {
       width: 100%;
@@ -289,6 +276,9 @@
       <option value="Régulière">Régulière</option>
       <option value="Professionnelle">Professionnelle</option>
     </select>
+
+    <label for="conditions">Conditions Médicales Spécifiques :</label>
+    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
   </div>
 
   <!-- Étape 2 : Symptômes -->
@@ -353,10 +343,10 @@
       renderer.setSize(window.innerWidth * 0.9, 400);
       document.getElementById("model3D").appendChild(renderer.domElement);
 
-      const geometry = new THREE.BoxGeometry();
+      const geometry = new THREE.SphereGeometry(1, 32, 32);
       const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      const cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
+      const sphere = new THREE.Mesh(geometry, material);
+      scene.add(sphere);
 
       camera.position.z = 5;
 
@@ -377,7 +367,7 @@
       const weight = document.getElementById("weight").value;
       const height = document.getElementById("height").value;
       const sport = document.getElementById("sport").value;
-      const conditions = document.getElementById("conditions").value || 'Aucune';
+      const conditions = document.getElementById("conditions").value;
       const symptoms = document.getElementById("symptoms").value;
 
       const diagnosisResult = document.getElementById("diagnosisResult");
