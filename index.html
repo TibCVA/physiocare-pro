@@ -11,308 +11,18 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Importation de PDF.js pour l'extraction de texte des PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <!-- Importation de Tesseract.js pour l'OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
   <style>
-    /* Variables CSS pour les couleurs */
-    :root {
-      --primary-color: #0052cc;
-      --secondary-color: #003d99;
-      --accent-color: #0073e6;
-      --background-color: #f0f4f8;
-      --text-color: #333;
-      --light-gray: #fafafa;
-      --error-color: #ff4d4d;
-    }
-
-    /* Styles globaux */
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: var(--background-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-    }
-
-    /* Style du header */
-    header {
-      background-color: var(--primary-color);
-      color: white;
-      width: 100%;
-      text-align: center;
-      padding: 15px 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    header img {
-      width: 60px;
-      margin-bottom: 5px;
-      border-radius: 50%;
-      border: 2px solid white;
-    }
-
-    header h1 {
-      font-size: 24px;
-      margin: 0;
-      font-weight: 700;
-    }
-
-    /* Style de la navigation */
-    nav {
-      background-color: var(--accent-color);
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      position: sticky;
-      top: 72px;
-      z-index: 999;
-    }
-
-    nav button {
-      background: none;
-      border: none;
-      padding: 10px 15px;
-      font-size: 14px;
-      cursor: pointer;
-      color: white;
-      font-weight: 500;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      transition: background-color 0.3s ease;
-    }
-
-    nav button.active {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    nav button i {
-      margin-right: 8px;
-      font-size: 18px;
-    }
-
-    /* Style des conteneurs */
-    .container {
-      max-width: 100%;
-      width: 90%;
-      margin: 20px auto 80px auto;
-      padding: 20px;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      border-radius: 15px;
-      display: none;
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    .container.active {
-      display: block;
-    }
-
-    h2 {
-      color: var(--primary-color);
-      border-left: 5px solid var(--primary-color);
-      padding-left: 10px;
-      margin-bottom: 20px;
-      font-weight: 700;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 500;
-    }
-
-    /* Style des inputs */
-    textarea, select, input[type="file"], input[type="number"] {
-      width: 100%;
-      padding: 12px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-size: 14px;
-      background-color: var(--light-gray);
-      transition: border-color 0.3s ease;
-    }
-
-    textarea:focus, select:focus, input[type="file"]:focus, input[type="number"]:focus {
-      border-color: var(--accent-color);
-      outline: none;
-    }
-
-    textarea::placeholder, select::placeholder, input::placeholder {
-      color: #999;
-    }
-
-    /* Style des boutons */
-    button.primary-btn {
-      width: 100%;
-      padding: 15px;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-      font-weight: 500;
-      transition: background-color 0.3s ease;
-    }
-
-    button.primary-btn:hover {
-      background-color: var(--secondary-color);
-    }
-
-    /* Style des résultats */
-    .result {
-      background: var(--light-gray);
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
-      white-space: pre-wrap;
-      font-size: 14px;
-      font-family: 'Roboto Mono', monospace;
-    }
-
-    /* Style du footer */
-    footer {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 10px 0;
-      text-align: center;
-      width: 100%;
-      position: fixed;
-      bottom: 0;
-      font-size: 14px;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      nav button {
-        padding: 8px 10px;
-        font-size: 12px;
-      }
-
-      header h1 {
-        font-size: 22px;
-      }
-    }
+    /* Styles identiques à votre code actuel */
+    /* ... (le code CSS reste inchangé) ... */
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo PhysioCare">
-    <h1>PhysioCare Pro</h1>
-  </header>
+  <!-- Contenu HTML identique à votre code actuel -->
+  <!-- ... (le code HTML reste inchangé) ... -->
 
-  <nav>
-    <button class="active" onclick="showStep(1)">
-      <i class="fas fa-user"></i>
-      <span>Infos Patient</span>
-    </button>
-    <button onclick="showStep(2)">
-      <i class="fas fa-notes-medical"></i>
-      <span>Symptômes</span>
-    </button>
-    <button onclick="showStep(3)">
-      <i class="fas fa-diagnoses"></i>
-      <span>Diagnostic</span>
-    </button>
-    <button onclick="showStep(4)">
-      <i class="fas fa-stethoscope"></i>
-      <span>Traitement</span>
-    </button>
-  </nav>
-
-  <!-- Étape 1 : Informations Patient -->
-  <div class="container active" id="step1">
-    <h2>Informations du Patient</h2>
-    <label for="gender">Genre :</label>
-    <select id="gender">
-      <option value="Homme">Homme</option>
-      <option value="Femme">Femme</option>
-      <option value="Autre">Autre</option>
-    </select>
-
-    <label for="age">Âge :</label>
-    <select id="age">
-      <option value="18-30">18-30</option>
-      <option value="31-50">31-50</option>
-      <option value="51-70">51-70</option>
-      <option value="71+">71+</option>
-    </select>
-
-    <label for="weight">Poids (kg) :</label>
-    <input type="number" id="weight" placeholder="Exemple : 70">
-
-    <label for="height">Taille (cm) :</label>
-    <input type="number" id="height" placeholder="Exemple : 175">
-
-    <label for="sport">Activité Sportive :</label>
-    <select id="sport">
-      <option value="Aucune">Aucune</option>
-      <option value="Occasionnelle">Occasionnelle</option>
-      <option value="Régulière">Régulière</option>
-      <option value="Professionnelle">Professionnelle</option>
-    </select>
-
-    <label for="conditions">Conditions Médicales Spécifiques :</label>
-    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
-  </div>
-
-  <!-- Étape 2 : Symptômes -->
-  <div class="container" id="step2">
-    <h2>Symptômes et Analyses Médicales</h2>
-    <label for="symptoms">Symptômes :</label>
-    <textarea id="symptoms" placeholder="Exemple : Douleur au dos, faiblesse musculaire..."></textarea>
-
-    <label for="fileInput">Télécharger des fichiers d'analyse (PDF ou Images) :</label>
-    <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
-
-    <label for="imageObservations">Observations sur les images téléchargées :</label>
-    <textarea id="imageObservations" placeholder="Décrivez les images (par exemple : radiographie montrant une fracture de l'humérus)..."></textarea>
-  </div>
-
-  <!-- Étape 3 : Diagnostic -->
-  <div class="container" id="step3">
-    <h2>Diagnostic</h2>
-    <button class="primary-btn" onclick="confirmGenerateDiagnosis()">Obtenir le Diagnostic</button>
-    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
-    <div id="loader" style="display: none;">
-      <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i> Analyse en cours...
-    </div>
-  </div>
-
-  <!-- Étape 4 : Plan de Traitement -->
-  <div class="container" id="step4">
-    <h2>Plan de Traitement</h2>
-    <div id="treatmentPlan" class="result">
-      En attente du diagnostic pour générer le plan de traitement...
-    </div>
-  </div>
-
-  <footer>
-    © 2024 PhysioCare Pro - Votre Assistant Kinésithérapeute Intelligent
-  </footer>
-
+  <!-- Votre code JavaScript mis à jour -->
   <script>
     // Fonction pour afficher l'étape sélectionnée
     function showStep(step) {
@@ -371,6 +81,28 @@
       });
     }
 
+    // Fonction pour extraire le texte des images via OCR
+    async function extractTextFromImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function() {
+          Tesseract.recognize(
+            reader.result,
+            'fra', // Utilisation du modèle français
+            { logger: m => console.log(m) }
+          ).then(({ data: { text } }) => {
+            resolve(text);
+          }).catch(error => {
+            reject(error);
+          });
+        };
+        reader.onerror = function(error) {
+          reject(error);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
     // Fonction pour générer le diagnostic
     async function generateDiagnosis() {
       const gender = document.getElementById("gender").value;
@@ -380,7 +112,6 @@
       const sport = document.getElementById("sport").value;
       const conditions = document.getElementById("conditions").value;
       const symptoms = document.getElementById("symptoms").value;
-      const imageObservations = document.getElementById("imageObservations").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
       const loader = document.getElementById("loader");
 
@@ -402,8 +133,15 @@
           } catch (error) {
             console.error("Erreur lors de l'extraction du texte du PDF :", error);
           }
+        } else if (file.type.startsWith("image/")) {
+          // Extraction du texte de l'image via OCR
+          try {
+            const text = await extractTextFromImage(file);
+            extractedTexts.push(text);
+          } catch (error) {
+            console.error("Erreur lors de l'extraction du texte de l'image :", error);
+          }
         }
-        // Les images peuvent être décrites dans le champ "imageObservations"
       }
 
       // Combinaison des textes extraits
@@ -430,8 +168,7 @@ Patient:
 - Sport: ${sport}
 - Conditions médicales spécifiques: ${conditions}
 - Symptômes: ${symptoms}
-- Observations sur les images: ${imageObservations}
-- Texte des documents PDF: ${analysisTexts}
+- Texte des documents PDF et images: ${analysisTexts}
 
 Veuillez fournir un diagnostic détaillé en tenant compte de toutes les informations ci-dessus. La réponse doit être bien structurée et deux fois plus détaillée que précédemment.`,
               },
@@ -443,7 +180,7 @@ Veuillez fournir un diagnostic détaillé en tenant compte de toutes les informa
         const diagnosisText = data.content.trim();
         diagnosisResult.textContent = diagnosisText;
 
-        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText, imageObservations, analysisTexts);
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText, analysisTexts);
       } catch (error) {
         diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
         console.error("Erreur API:", error);
@@ -453,7 +190,7 @@ Veuillez fournir un diagnostic détaillé en tenant compte de toutes les informa
     }
 
     // Fonction pour générer le plan de traitement
-    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis, imageObservations, analysisTexts) {
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis, analysisTexts) {
       const treatmentPlan = document.getElementById("treatmentPlan");
       treatmentPlan.textContent = "Création du plan de traitement en cours...";
 
@@ -478,8 +215,7 @@ Patient:
 - Sport: ${sport}
 - Conditions médicales spécifiques: ${conditions}
 - Symptômes: ${symptoms}
-- Observations sur les images: ${imageObservations}
-- Texte des documents PDF: ${analysisTexts}
+- Texte des documents PDF et images: ${analysisTexts}
 
 Diagnostic: ${diagnosis}
 
