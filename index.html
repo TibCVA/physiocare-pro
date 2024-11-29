@@ -5,16 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
   <!-- Importation des polices -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href=https://fonts.googleapis.com>
+  <link href=https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap rel="stylesheet">
   <!-- Importation de Font Awesome pour les icônes -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-p1zY+0Ma5d0p/7he5Z4/IvFyrTqg6VwjC0c7eKnQ/OXt4dCHYgrUE9CMW/awhnxjfGmrdqcz5O75GPb8p6imCw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+  <link rel="stylesheet" href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     /* Variables CSS pour les couleurs */
     :root {
@@ -130,7 +124,7 @@
     .container {
       max-width: 100%;
       width: 90%;
-      margin: 20px auto 80px auto;
+      margin: 20px auto;
       padding: 20px;
       background: white;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -220,21 +214,27 @@
       font-size: 16px;
       font-family: 'Roboto Mono', monospace;
       border: 1px solid var(--primary-color);
-      max-height: 400px;
-      overflow-y: auto;
     }
 
-    .result h3 {
-      margin-top: 0;
-      color: var(--primary-color);
+    .result ul {
+      list-style: none;
+      padding-left: 0;
     }
 
-    /* Style du loader */
-    #loader {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 18px;
+    .result ul li {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .result ul li::before {
+      content: "\f00c";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
       color: var(--primary-color);
+      margin-right: 10px;
     }
 
     /* Style du footer */
@@ -247,6 +247,18 @@
       position: fixed;
       bottom: 0;
       font-size: 14px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Responsive */
@@ -267,6 +279,443 @@
     <img src="logo.png" alt="Logo PhysioCare">
     <h1>PhysioCare Pro</h1>
     <button id="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showStep(1)">
+      <i class="fas fa-user"></i>
+      <span>Infos Patient</span>
+    </button>
+    <button onclick="showStep(2)">
+      <i class="fas fa-notes-medical"></i>
+      <span>Symptômes</span>
+    </button>
+    <button onclick="showStep(3)">
+      <i class="fas fa-diagnoses"></i>
+      <span>Diagnostic</span>
+    </button>
+    <button onclick="showStep(4)">
+      <i class="fas fa-stethoscope"></i>
+      <span>Traitement</span>
+    </button>
+  </nav>
+
+  <!-- Étape 1 : Informations Patient -->
+  <div class="container active" id="step1">
+    <h2>Informations du Patient</h2>
+    <label for="gender">Genre :</label>
+    <select id="gender">
+      <option value="Homme">Homme</option>
+      <option value="Femme">Femme</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <label for="age">Âge :</label>
+    <select id="age">
+      <option value="18-30">18-30</option>
+      <option value="31-50">31-50</option>
+      <option value="51-70">51-70</option>
+      <option value="71+">71+</option>
+    </select>
+
+    <label for="weight">Poids (kg) :</label>
+    <input type="number" id="weight" placeholder="Exemple : 70">
+    <span class="error-message"></span>
+
+    <label for="height">Taille (cm) :</label>
+    <input type="number" id="height" placeholder="Exemple : 175">
+    <span class="error-message"></span>
+
+    <label for="sport">Activité Sportive :</label>
+    <select id="sport">
+      <option value="Aucune">Aucune</option>
+      <option value="Occasionnelle">Occasionnelle</option>
+      <option value="Régulière">Régulière</option>
+      <option value="Professionnelle">Professionnelle</option>
+    </select>
+    <span class="tooltip">i
+      <span class="tooltiptext">Une activité sportive professionnelle implique un entraînement régulier, intense et compétitif.</span>
+    </span>
+
+    <label for="conditions">Conditions Médicales Spécifiques :</label>
+    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
+  </div>
+
+  <!-- Étape 2 : Symptômes -->
+  <div class="container" id="step2">
+    <h2>Symptômes et Analyses Médicales</h2>
+    <label for="symptoms">Symptômes :</label>
+    <textarea id="symptoms" placeholder="Exemple : Douleur au dos, faiblesse musculaire..."></textarea>
+
+    <label for="fileInput">Télécharger des fichiers d'analyse (PDF ou Images) :</label>
+    <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
+  </div>
+
+  <!-- Étape 3 : Diagnostic -->
+  <div class="container" id="step3">
+    <h2>Diagnostic</h2>
+    <button class="primary-btn" onclick="confirmGenerateDiagnosis()">Obtenir le Diagnostic</button>
+    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
+    <div id="loader" style="display: none;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i> Analyse en cours...
+    </div>
+  </div>
+
+  <!-- Étape 4 : Plan de Traitement -->
+  <div class="container" id="step4">
+    <h2>Plan de Traitement</h2>
+    <div id="treatmentPlan" class="result">
+      En attente du diagnostic pour générer le plan de traitement...
+    </div>
+  </div>
+
+  <footer>
+    © 2024 PhysioCare Pro - Votre Assistant Kinésithérapeute Intelligent
+  </footer>
+
+  <script>
+    function showStep(step) {
+      const steps = document.querySelectorAll('.container');
+      const buttons = document.querySelectorAll('nav button');
+      steps.forEach((container, index) => {
+        container.classList.remove('active');
+        if (index + 1 === step) container.classList.add('active');
+      });
+      buttons.forEach((button, index) => {
+        button.classList.remove('active');
+        if (index + 1 === step) button.classList.add('active');
+      });
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function confirmGenerateDiagnosis() {
+      if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
+        generateDiagnosis();
+      }
+    }
+
+    async function generateDiagnosis() {
+      const gender = document.getElementById("gender").value;
+      const age = document.getElementById("age").value;
+      const weight = document.getElementById("weight").value;
+      const height = document.getElementById("height").value;
+      const sport = document.getElementById("sport").value;
+      const conditions = document.getElementById("conditions").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+      const loader = document.getElementById("loader");
+
+      diagnosisResult.textContent = "";
+      loader.style.display = "block";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
+            messages: [
+              {
+                role: "user",
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        const diagnosisText = data.content.trim();
+        diagnosisResult.textContent = diagnosisText;
+
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
+      } catch (error) {
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
+        console.error("Erreur API:", error);
+      } finally {
+        loader.style.display = "none";
+      }
+    }
+
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
+      const treatmentPlan = document.getElementById("treatmentPlan");
+      treatmentPlan.textContent = "Création du plan de traitement en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
+            messages: [
+              {
+                role: "user",
+                content: `
+Patient:
+- Genre: ${gender}
+- Âge: ${age}
+- Poids: ${weight}
+- Taille: ${height}
+- Sport: ${sport}
+- Conditions médicales spécifiques: ${conditions}
+- Symptômes: ${symptoms}
+
+Diagnostic: ${diagnosis}
+
+Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        treatmentPlan.textContent = data.content.trim();
+      } catch (error) {
+        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
+        console.error("Erreur complète :", error);
+      }
+    }
+  </script>
+</body>
+</html>
+
+From: Thibaut LACOUR <thibaut.lacour@cva-france.fr> 
+Sent: Friday, November 29, 2024 12:38 AM
+To: Thibaut LACOUR <thibaut.lacour@cva-france.fr>
+Subject: Code O1
+
+Je fais une webapp qui fonctionne déjà pour Iphone 14 pro à destination des kinésithérapeutes. Tu es le meilleur designer et spécialiste UX web du monde. 
+Voici le code fonctionnel à date et ensuite mes commentaires :
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>PhysioCare Pro</title>
+  <!-- Importation des polices -->
+  <link rel="preconnect" href=https://fonts.googleapis.com>
+  <link href=https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap rel="stylesheet">
+  <!-- Importation de Font Awesome pour les icônes -->
+  <link rel="stylesheet" href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Variables CSS pour les couleurs */
+    :root {
+      --primary-color: #0052cc;
+      --secondary-color: #003d99;
+      --accent-color: #0073e6;
+      --background-color: #f0f4f8;
+      --text-color: #333;
+      --light-gray: #fafafa;
+      --error-color: #ff4d4d;
+    }
+
+    /* Styles globaux */
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Style du header */
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      width: 100%;
+      text-align: center;
+      padding: 15px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header img {
+      width: 60px;
+      margin-bottom: 5px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    /* Style de la navigation */
+    nav {
+      background-color: var(--accent-color);
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      position: sticky;
+      top: 72px;
+      z-index: 999;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      color: white;
+      font-weight: 500;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+
+    nav button.active {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    nav button i {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+
+    /* Style des conteneurs */
+    .container {
+      max-width: 100%;
+      width: 90%;
+      margin: 20px auto 80px auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 15px;
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    h2 {
+      color: var(--primary-color);
+      border-left: 5px solid var(--primary-color);
+      padding-left: 10px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
+    }
+
+    /* Style des inputs */
+    textarea, select, input[type="file"], input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: var(--light-gray);
+      transition: border-color 0.3s ease;
+    }
+
+    textarea:focus, select:focus, input[type="file"]:focus, input[type="number"]:focus {
+      border-color: var(--accent-color);
+      outline: none;
+    }
+
+    textarea::placeholder, select::placeholder, input::placeholder {
+      color: #999;
+    }
+
+    /* Style des boutons */
+    button.primary-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    button.primary-btn:hover {
+      background-color: var(--secondary-color);
+    }
+
+    /* Style des résultats */
+    .result {
+      background: var(--light-gray);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    /* Style du footer */
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+      width: 100%;
+      position: fixed;
+      bottom: 0;
+      font-size: 14px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav button {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo PhysioCare">
+    <h1>PhysioCare Pro</h1>
   </header>
 
   <nav>
@@ -337,33 +786,21 @@
   <!-- Étape 3 : Diagnostic -->
   <div class="container" id="step3">
     <h2>Diagnostic</h2>
-    <button class="primary-btn" onclick="confirmGenerateDiagnosis()">Obtenir le Diagnostic</button>
-    <div id="diagnosisResult" class="result">
-      <h3>Résultat du Diagnostic :</h3>
-      <p>En attente...</p>
-    </div>
-    <div id="loader" style="display: none;">
-      <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i> Analyse en cours...
-    </div>
+    <button class="primary-btn" onclick="generateDiagnosis()">Obtenir le Diagnostic</button>
+    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
   </div>
 
   <!-- Étape 4 : Plan de Traitement -->
   <div class="container" id="step4">
     <h2>Plan de Traitement</h2>
     <div id="treatmentPlan" class="result">
-      <h3>Proposition de Traitement :</h3>
-      <p>En attente du diagnostic pour générer le plan de traitement...</p>
+      En attente du diagnostic pour générer le plan de traitement...
     </div>
   </div>
 
   <footer>
     © 2024 PhysioCare Pro - Votre Assistant Kinésithérapeute Intelligent
   </footer>
-
-  <!-- Importation de PDF.js pour l'extraction de texte des PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <!-- Importation de Tesseract.js pour l'OCR -->
-  <script src="https://unpkg.com/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
 
   <script>
     function showStep(step) {
@@ -379,76 +816,6 @@
       });
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-    }
-
-    function confirmGenerateDiagnosis() {
-      if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
-        generateDiagnosis();
-      }
-    }
-
-    // Fonction pour extraire le texte des fichiers PDF
-    async function extractTextFromPDF(file) {
-      return new Promise((resolve, reject) => {
-        const fileReader = new FileReader();
-
-        fileReader.onload = function() {
-          const typedarray = new Uint8Array(this.result);
-
-          pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
-            let maxPages = pdf.numPages;
-            let countPromises = []; // collecte des promesses pour chaque page
-            for (let j = 1; j <= maxPages; j++) {
-              let page = pdf.getPage(j);
-
-              countPromises.push(page.then(function(page) {
-                // promesse pour la page
-                let textContent = page.getTextContent();
-                return textContent.then(function(text) {
-                  return text.items.map(function (s) { return s.str; }).join(' ');
-                });
-              }));
-            }
-            Promise.all(countPromises).then(function (texts) {
-              resolve(texts.join(' '));
-            });
-          }).catch(function(error) {
-            reject(error);
-          });
-        };
-
-        fileReader.onerror = function(error) {
-          reject(error);
-        };
-
-        fileReader.readAsArrayBuffer(file);
-      });
-    }
-
-    // Fonction pour extraire le texte des images via OCR
-    async function extractTextFromImage(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function() {
-          Tesseract.recognize(
-            reader.result,
-            'fra', // Utilisation du modèle français
-            { logger: m => console.log(m) }
-          ).then(({ data: { text } }) => {
-            resolve(text);
-          }).catch(error => {
-            reject(error);
-          });
-        };
-        reader.onerror = function(error) {
-          reject(error);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
     async function generateDiagnosis() {
       const gender = document.getElementById("gender").value;
       const age = document.getElementById("age").value;
@@ -458,165 +825,76 @@
       const conditions = document.getElementById("conditions").value;
       const symptoms = document.getElementById("symptoms").value;
       const diagnosisResult = document.getElementById("diagnosisResult");
-      const loader = document.getElementById("loader");
 
-      diagnosisResult.querySelector('p').textContent = "";
-      loader.style.display = "block";
-
-      // Traitement des fichiers téléchargés
-      const fileInput = document.getElementById("fileInput");
-      const files = fileInput.files;
-      let extractedTexts = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.type === "application/pdf") {
-          // Extraction du texte du PDF
-          try {
-            const text = await extractTextFromPDF(file);
-            extractedTexts.push(text);
-          } catch (error) {
-            console.error("Erreur lors de l'extraction du texte du PDF :", error);
-          }
-        } else if (file.type.startsWith("image/")) {
-          // Extraction du texte de l'image via OCR
-          try {
-            const text = await extractTextFromImage(file);
-            extractedTexts.push(text);
-          } catch (error) {
-            console.error("Erreur lors de l'extraction du texte de l'image :", error);
-          }
-        }
-      }
-
-      // Combinaison des textes extraits
-      const analysisTexts = extractedTexts.join("\n");
+      diagnosisResult.textContent = "Analyse en cours...";
 
       try {
-        // Appel direct à l'API d'Anthropic
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-            "x-api-key": "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" // Remplacez par votre clé API
           },
           body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022", // Modèle demandé
-            max_tokens: 5000, // Ajustez cette valeur selon vos besoins
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
             messages: [
               {
                 role: "user",
-                content: `
-    Patient:
-    - Genre: ${gender}
-    - Âge: ${age}
-    - Poids: ${weight}
-    - Taille: ${height}
-    - Sport: ${sport}
-    - Conditions médicales spécifiques: ${conditions}
-    - Symptômes: ${symptoms}
-    - Texte des documents PDF et images: ${analysisTexts}
-
-    Veuillez fournir un diagnostic détaillé en tenant compte de toutes les informations ci-dessus. La réponse doit être bien structurée et précise.
-    `
-              }
-            ]
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
+              },
+            ],
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP : ${response.status}`);
-        }
-
         const data = await response.json();
+        const diagnosisText = data.content.trim();
+        diagnosisResult.textContent = diagnosisText;
 
-        // Extraction du contenu de la réponse
-        let content = '';
-
-        if (Array.isArray(data.content) && data.content.length > 0) {
-          content = data.content.map(item => item.text).join('').trim();
-        } else if (data.completion) {
-          content = data.completion.trim();
-        }
-
-        if (content) {
-          diagnosisResult.querySelector('p').textContent = content;
-
-          // Appel à la fonction pour générer le plan de traitement
-          generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, content, analysisTexts);
-        } else {
-          throw new Error("La réponse de l'API est invalide.");
-        }
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
       } catch (error) {
-        diagnosisResult.querySelector('p').textContent = "Erreur lors de l'établissement du diagnostic.";
-        console.error("Erreur complète :", error);
-      } finally {
-        loader.style.display = "none";
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
+        console.error("Erreur API:", error);
       }
     }
 
-    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis, analysisTexts) {
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
       const treatmentPlan = document.getElementById("treatmentPlan");
-      treatmentPlan.querySelector('p').textContent = "Création du plan de traitement en cours...";
+      treatmentPlan.textContent = "Création du plan de traitement en cours...";
 
       try {
-        // Appel direct à l'API d'Anthropic
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("/.netlify/functions/diagnosis", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-            "x-api-key": "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" // Remplacez par votre clé API
           },
           body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022", // Modèle demandé
-            max_tokens: 5000, // Ajustez cette valeur selon vos besoins
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
             messages: [
               {
                 role: "user",
                 content: `
-    Patient:
-    - Genre: ${gender}
-    - Âge: ${age}
-    - Poids: ${weight}
-    - Taille: ${height}
-    - Sport: ${sport}
-    - Conditions médicales spécifiques: ${conditions}
-    - Symptômes: ${symptoms}
-    - Texte des documents PDF et images: ${analysisTexts}
+Patient:
+- Genre: ${gender}
+- Âge: ${age}
+- Poids: ${weight}
+- Taille: ${height}
+- Sport: ${sport}
+- Conditions médicales spécifiques: ${conditions}
+- Symptômes: ${symptoms}
 
-    Diagnostic: ${diagnosis}
+Diagnostic: ${diagnosis}
 
-    Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes, en intégrant les résultats des analyses médicales fournies. Le protocole doit être bien structuré, détaillé, et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez en utilisant des titres, sous-titres, et listes à puces avec des **recommandations claires** pour les soins, exercices ou traitements.
-    `
-              }
-            ]
+Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+              },
+            ],
           }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP : ${response.status}`);
-        }
-
         const data = await response.json();
-
-        // Extraction du contenu de la réponse
-        let content = '';
-
-        if (Array.isArray(data.content) && data.content.length > 0) {
-          content = data.content.map(item => item.text).join('').trim();
-        } else if (data.completion) {
-          content = data.completion.trim();
-        }
-
-        if (content) {
-          treatmentPlan.querySelector('p').textContent = content;
-        } else {
-          throw new Error("La réponse de l'API est invalide.");
-        }
+        treatmentPlan.textContent = data.content.trim();
       } catch (error) {
-        treatmentPlan.querySelector('p').textContent = "Erreur lors de la création du plan de traitement.";
+        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
         console.error("Erreur complète :", error);
       }
     }
