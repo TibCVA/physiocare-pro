@@ -49,7 +49,12 @@ exports.handler = async (event) => {
     const claudeData = await claudeResponse.json();
     console.log('Claude API Réponse complète :', claudeData);
 
-    const content = claudeData.completion?.trim() || claudeData.messages?.[0]?.content?.trim();
+    // Extraction du contenu de la réponse
+    let content = '';
+
+    if (Array.isArray(claudeData.content) && claudeData.content.length > 0) {
+      content = claudeData.content.map(item => item.text).join('').trim();
+    }
 
     if (!content) {
       console.error('La réponse Claude est mal formée ou vide.', claudeData);
