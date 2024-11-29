@@ -6,9 +6,6 @@
 [functions]
   node_bundler = "esbuild"
 
-[functions."*"]
-  timeout = 26  # Si vous êtes sur un plan Netlify payant
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
