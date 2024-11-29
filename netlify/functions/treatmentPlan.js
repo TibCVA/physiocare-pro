@@ -1,4 +1,3 @@
-// treatmentPlan.js
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
@@ -68,7 +67,7 @@ Basé sur les informations ci-dessus, générez une **proposition théorique de 
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 5000, // Augmentation pour des réponses plus détaillées
+        max_tokens: 2000, // Réduction pour éviter les surcharges
         messages: [
           {
             role: 'user',
