@@ -4,180 +4,394 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>PhysioCare Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Importation des polices -->
+  <link rel="preconnect" href=https://fonts.googleapis.com>
+  <link href=https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap rel="stylesheet">
+  <!-- Importation de Font Awesome pour les icônes -->
+  <link rel="stylesheet" href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* ... [Styles précédents inchangés jusqu'à nav-bar] ... */
+    /* Variables CSS pour les couleurs */
+    :root {
+      --primary-color: #007BFF;
+      --secondary-color: #0056b3;
+      --accent-color: #28a745;
+      --background-color: #f8f9fa;
+      --text-color: #343a40;
+      --light-gray: #e9ecef;
+      --error-color: #dc3545;
+      --neumorphic-light: #ffffff;
+      --neumorphic-shadow: #d1d9e6;
+    }
 
-    .section {
+    /* Mode sombre */
+    body.dark-mode {
+      --primary-color: #343a40;
+      --background-color: #121212;
+      --text-color: #f8f9fa;
+      --light-gray: #6c757d;
+      --neumorphic-light: #3a3a3a;
+      --neumorphic-shadow: #1a1a1a;
+    }
+
+    /* Styles globaux */
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Style du header */
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    header img {
+      width: 50px;
+      margin-right: 15px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    /* Bouton pour basculer le thème */
+    #theme-toggle {
+      position: absolute;
+      right: 20px;
+      top: 15px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    #theme-toggle:hover {
+      transform: scale(1.2);
+    }
+
+    /* Style de la navigation flottante en bas */
+    nav {
+      background-color: var(--primary-color);
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+      z-index: 999;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+    }
+
+    nav button {
+      background: var(--neumorphic-light);
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--text-color);
+      font-weight: 500;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 8px 8px 15px var(--neumorphic-shadow), -8px -8px 15px #ffffff;
+    }
+
+    nav button.active {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    nav button i {
+      font-size: 22px;
+    }
+
+    /* Style des conteneurs */
+    .container {
+      max-width: 100%;
+      width: 90%;
+      margin: 100px auto;
+      padding: 15px;
+      background: var(--neumorphic-light);
+      box-shadow: 8px 8px 15px var(--neumorphic-shadow), -8px -8px 15px #ffffff;
+      border-radius: 20px;
       display: none;
-      max-width: 800px;
-      margin: 1rem auto;
-      padding: 1.5rem;
-      background: var(--background-primary);
-      border-radius: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      animation: fadeIn 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
     }
 
-    .section.active {
+    .container.active {
       display: block;
+      opacity: 1;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    h2 {
+      color: var(--secondary-color);
+      border-left: 5px solid var(--secondary-color);
+      padding-left: 10px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 18px;
     }
 
-    .symptoms-section textarea {
-      min-height: 150px;
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
     }
 
-    .diagnostic-button {
-      background: var(--system-green);
-      margin-top: 1rem;
+    /* Style des inputs */
+    textarea, select, input[type="file"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ced4da;
+      border-radius: 12px;
+      box-sizing: border-box;
+      font-size: 14px;
+      background-color: var(--light-gray);
+      transition: border-color 0.3s ease;
+      box-shadow: inset 8px 8px 15px var(--neumorphic-shadow), inset -8px -8px 15px #ffffff;
     }
 
-    /* ... [Reste des styles précédents] ... */
-  </style>
-</head>
-<body>
-  <div class="app-container">
-    <!-- Header reste identique -->
-    <header class="header">
-      <div class="header-content">
-        <div class="logo-container">
-          <img src="/api/placeholder/40/40" alt="Logo" class="logo">
-          <h1 class="app-title">PhysioCare Pro</h1>
-        </div>
-      </div>
-    </header>
-
-    <main id="main-content">
-      <!-- Section Patient -->
-      <section id="patient-section" class="section active">
-        <h2 class="section-title">Informations du Patient</h2>
-        <div class="input-group">
-          <label class="input-label" for="gender">Genre</label>
-          <select class="select-input" id="gender">
-            <option value="" disabled selected>Sélectionner</option>
-            <option value="Homme">Homme</option>
-            <option value="Femme">Femme</option>
-            <option value="Autre">Autre</option>
-          </select>
-        </div>
-        <!-- ... Autres champs patient ... -->
-      </section>
-
-      <!-- Section Symptômes -->
-      <section id="symptoms-section" class="section">
-        <h2 class="section-title">Symptômes</h2>
-        <div class="input-group">
-          <label class="input-label" for="symptoms">Description des symptômes</label>
-          <textarea id="symptoms" class="text-input" placeholder="Décrivez les symptômes..."></textarea>
-        </div>
-        <div class="input-group">
-          <label class="input-label">Fichiers d'analyse</label>
-          <input type="file" id="fileInput" multiple accept="image/*,application/pdf" class="text-input">
-        </div>
-      </section>
-
-      <!-- Section Diagnostic -->
-      <section id="diagnostic-section" class="section">
-        <h2 class="section-title">Diagnostic</h2>
-        <button onclick="generateDiagnosis()" class="button diagnostic-button">
-          Obtenir le Diagnostic
-        </button>
-        <div id="diagnosis-result" class="result-content"></div>
-      </section>
-
-      <!-- Section Traitement -->
-      <section id="treatment-section" class="section">
-        <h2 class="section-title">Plan de Traitement</h2>
-        <div id="treatment-plan" class="result-content">
-          En attente du diagnostic...
-        </div>
-      </section>
-    </main>
-
-    <nav class="nav-bar">
-      <div class="nav-content">
-        <button onclick="showSection('patient')" class="nav-item active">
-          <i class="nav-icon fas fa-user"></i>
-          <span class="nav-label">Patient</span>
-        </button>
-        <button onclick="showSection('symptoms')" class="nav-item">
-          <i class="nav-icon fas fa-notes-medical"></i>
-          <span class="nav-label">Symptômes</span>
-        </button>
-        <button onclick="showSection('diagnostic')" class="nav-item">
-          <i class="nav-icon fas fa-stethoscope"></i>
-          <span class="nav-label">Diagnostic</span>
-        </button>
-        <button onclick="showSection('treatment')" class="nav-item">
-          <i class="nav-icon fas fa-hospital"></i>
-          <span class="nav-label">Traitement</span>
-        </button>
-      </div>
-    </nav>
-  </div>
-
-  <script>
-    function showSection(sectionName) {
-      // Masquer toutes les sections
-      document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-      });
-
-      // Afficher la section sélectionnée
-      document.getElementById(sectionName + '-section').classList.add('active');
-
-      // Mettre à jour la navigation
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      event.currentTarget.classList.add('active');
+    textarea:focus, select:focus, input[type="file"]:focus, input[type="number"]:focus {
+      border-color: var(--accent-color);
+      outline: none;
+      box-shadow: 0 0 5px var(--accent-color);
     }
 
-    async function generateDiagnosis() {
-      const diagnosisResult = document.getElementById('diagnosis-result');
-      diagnosisResult.textContent = 'Génération du diagnostic...';
+    textarea::placeholder, select::placeholder, input::placeholder {
+      color: #999;
+    }
 
-      // Collecter les données
-      const formData = {
-        gender: document.getElementById('gender').value,
-        symptoms: document.getElementById('symptoms').value,
-        // ... autres champs
-      };
+    /* Style des boutons */
+    button.primary-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      animation: pulse 1.5s infinite;
+    }
 
-      try {
-        const response = await fetch("/.netlify/functions/diagnosis", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "claude-3-5-sonnet-20241022",
-            max_tokens: 5000,
-            messages: [{
-              role: "user",
-              content: `Patient: Genre: ${formData.gender}, Symptômes: ${formData.symptoms}`
-            }]
-          })
-        });
+    button.primary-btn:hover {
+      background-color: #218838;
+      transform: translateY(-3px);
+    }
 
-        const data = await response.json();
-        diagnosisResult.textContent = data.content;
-        generateTreatmentPlan(formData, data.content);
-      } catch (error) {
-        diagnosisResult.textContent = "Erreur lors de la génération du diagnostic.";
-        console.error(error);
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
       }
     }
 
-    async function generateTreatmentPlan(formData, diagnosis) {
-      const treatmentPlan = document.getElementById('treatment-plan');
-      treatmentPlan.textContent = 'Génération du plan de traitement...';
+    /* Style des résultats */
+    .result {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 30px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      font-family: 'Roboto Mono', monospace;
+      border: 1px solid var(--primary-color);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .result ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .result ul li {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .result ul li::before {
+      content: "\f00c";
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      color: var(--primary-color);
+      margin-right: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav button {
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo PhysioCare">
+    <h1>PhysioCare Pro</h1>
+    <button id="theme-toggle" onclick="toggleTheme()">🌙 / ☀️</button>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showStep(1)">
+      <i class="fas fa-user"></i>
+    </button>
+    <button onclick="showStep(2)">
+      <i class="fas fa-notes-medical"></i>
+    </button>
+    <button onclick="showStep(3)">
+      <i class="fas fa-diagnoses"></i>
+    </button>
+    <button onclick="showStep(4)">
+      <i class="fas fa-stethoscope"></i>
+    </button>
+  </nav>
+
+  <!-- Étape 1 : Informations Patient -->
+  <div class="container active" id="step1">
+    <h2>Informations du Patient</h2>
+    <label for="gender">Genre :</label>
+    <select id="gender">
+      <option value="Homme">Homme</option>
+      <option value="Femme">Femme</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <label for="age">Âge :</label>
+    <select id="age">
+      <option value="18-30">18-30</option>
+      <option value="31-50">31-50</option>
+      <option value="51-70">51-70</option>
+      <option value="71+">71+</option>
+    </select>
+
+    <label for="weight">Poids (kg) :</label>
+    <input type="number" id="weight" placeholder="Exemple : 70">
+    <span class="error-message"></span>
+
+    <label for="height">Taille (cm) :</label>
+    <input type="number" id="height" placeholder="Exemple : 175">
+    <span class="error-message"></span>
+
+    <label for="sport">Activité Sportive :</label>
+    <select id="sport">
+      <option value="Aucune">Aucune</option>
+      <option value="Occasionnelle">Occasionnelle</option>
+      <option value="Régulière">Régulière</option>
+      <option value="Professionnelle">Professionnelle</option>
+    </select>
+    <span class="tooltip">i
+      <span class="tooltiptext">Une activité sportive professionnelle implique un entraînement régulier, intense et compétitif.</span>
+    </span>
+
+    <label for="conditions">Conditions Médicales Spécifiques :</label>
+    <textarea id="conditions" placeholder="Exemple : Diabète, hypertension, etc."></textarea>
+  </div>
+
+  <!-- Étape 2 : Symptômes -->
+  <div class="container" id="step2">
+    <h2>Symptômes et Analyses Médicales</h2>
+    <label for="symptoms">Symptômes :</label>
+    <textarea id="symptoms" placeholder="Exemple : Douleur au dos, faiblesse musculaire..."></textarea>
+
+    <label for="fileInput">Télécharger des fichiers d'analyse (PDF ou Images) :</label>
+    <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
+  </div>
+
+  <!-- Étape 3 : Diagnostic -->
+  <div class="container" id="step3">
+    <h2>Diagnostic</h2>
+    <button class="primary-btn" onclick="confirmGenerateDiagnosis()">Obtenir le Diagnostic</button>
+    <div id="diagnosisResult" class="result">Résultat du diagnostic : En attente...</div>
+    <div id="loader" style="display: none;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 24px;"></i> Analyse en cours...
+    </div>
+  </div>
+
+  <!-- Étape 4 : Plan de Traitement -->
+  <div class="container" id="step4">
+    <h2>Plan de Traitement</h2>
+    <div id="treatmentPlan" class="result">
+      En attente du diagnostic pour générer le plan de traitement...
+    </div>
+  </div>
+
+  <script>
+    function showStep(step) {
+      const steps = document.querySelectorAll('.container');
+      const buttons = document.querySelectorAll('nav button');
+      steps.forEach((container, index) => {
+        container.classList.remove('active');
+        if (index + 1 === step) container.classList.add('active');
+      });
+      buttons.forEach((button, index) => {
+        button.classList.remove('active');
+        if (index + 1 === step) button.classList.add('active');
+      });
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function confirmGenerateDiagnosis() {
+      if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
+        generateDiagnosis();
+      }
+    }
+
+    async function generateDiagnosis() {
+      const gender = document.getElementById("gender").value;
+      const age = document.getElementById("age").value;
+      const weight = document.getElementById("weight").value;
+      const height = document.getElementById("height").value;
+      const sport = document.getElementById("sport").value;
+      const conditions = document.getElementById("conditions").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const diagnosisResult = document.getElementById("diagnosisResult");
+      const loader = document.getElementById("loader");
+
+      diagnosisResult.textContent = "";
+      loader.style.display = "block";
 
       try {
         const response = await fetch("/.netlify/functions/diagnosis", {
@@ -188,22 +402,67 @@
           body: JSON.stringify({
             model: "claude-3-5-sonnet-20241022",
             max_tokens: 5000,
-            messages: [{
-              role: "user",
-              content: `
-                Patient: ${JSON.stringify(formData)}
-                Diagnostic: ${diagnosis}
-                Tâche: Générer un protocole de soins personnalisé.
-              `
-            }]
-          })
+            messages: [
+              {
+                role: "user",
+                content: `Patient: Genre : ${gender}, Âge : ${age}, Poids : ${weight}, Taille : ${height}, Sport : ${sport}, Conditions médicales : ${conditions}, Symptômes : ${symptoms}.`,
+              },
+            ],
+          }),
         });
 
         const data = await response.json();
-        treatmentPlan.textContent = data.content;
+        const diagnosisText = data.content.trim();
+        diagnosisResult.textContent = diagnosisText;
+
+        generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
       } catch (error) {
-        treatmentPlan.textContent = "Erreur lors de la génération du plan.";
-        console.error(error);
+        diagnosisResult.textContent = "Erreur lors de l'établissement du diagnostic.";
+        console.error("Erreur API:", error);
+      } finally {
+        loader.style.display = "none";
+      }
+    }
+
+    async function generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosis) {
+      const treatmentPlan = document.getElementById("treatmentPlan");
+      treatmentPlan.textContent = "Création du plan de traitement en cours...";
+
+      try {
+        const response = await fetch("/.netlify/functions/diagnosis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 5000,
+            messages: [
+              {
+                role: "user",
+                content: `
+Patient:
+- Genre: ${gender}
+- Âge: ${age}
+- Poids: ${weight}
+- Taille: ${height}
+- Sport: ${sport}
+- Conditions médicales spécifiques: ${conditions}
+- Symptômes: ${symptoms}
+
+Diagnostic: ${diagnosis}
+
+Tâche : Basé sur les informations ci-dessus, générez une **proposition théorique de protocole de soins très précis et personnalisé à valider par un kinésithérapeute**, parfaitement adapté aux spécificités du patient et de ses symptômes et basé uniquement sur l'état de l'art le plus fiable et récent dans le domaine de la kinésithérapie. Ne donnez pas de diagnostic. Précisez que ce protocole doit impérativement être validé par un professionnel avant application. Répondez uniquement sous la forme d'une liste à puces avec des **recommandations claires** pour les soins, exercices ou traitements.`,
+              },
+            ],
+          }),
+        });
+
+        const data = await response.json();
+        treatmentPlan.textContent = data.content.trim();
+      } catch (error) {
+        treatmentPlan.textContent = "Erreur lors de la création du plan de traitement.";
+        console.error("Erreur complète :", error);
       }
     }
   </script>
