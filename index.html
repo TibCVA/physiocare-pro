@@ -15,414 +15,7 @@
   <!-- Importation de jsPDF pour la génération du PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <style>
-    /* Variables CSS pour les couleurs */
-    :root {
-      --primary-color: #005F9E;
-      --secondary-color: #333333;
-      --accent-color: #58C493;
-      --background-color: #FFFFFF;
-      --text-color: #1A1A1A;
-      --light-gray: #E0E0E0;
-      --input-background: #F7F7F7;
-      --input-border: #D0D0D0;
-      --button-hover-color: #007BCE;
-      --button-active-color: #00477C;
-      --button-download-color: #0056A1;
-      --nav-active-bg: #E0F3FF;
-      --section-padding: 16px;
-      --section-margin: 24px;
-      --border-radius: 8px;
-      --confirmation-bg: #E8F5E9;
-      --confirmation-text-color: #2E7D32;
-      --upload-bg: #FAFAFA;
-      --alert-warning-bg: #FFF9E0;
-      --alert-warning-text: #1A1A1A;
-      --header-height: 60px;
-      --header-padding: 0 20px;
-      --logo-size: 50px;
-      --title-size: 22pt;
-      --button-height: 50px;
-      --button-font-size: 18px;
-      --button-padding: 0 16px;
-      --footer-height: 40px;
-    }
-
-    /* Styles globaux */
-    html,
-    body {
-      overflow-x: hidden;
-      margin: 0;
-      padding: 0;
-      background: var(--background-color);
-      color: var(--text-color);
-      font-family: 'SF Pro Display', 'Roboto Slab', 'Roboto', Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    /* Style du header */
-    header {
-      background: linear-gradient(135deg, #005F9E, #0073E6);
-      color: white;
-      width: 100%;
-      height: var(--header-height);
-      padding: var(--header-padding);
-      position: fixed;
-      top: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-bottom: 1px solid #00477C;
-    }
-
-    @media (max-width: 600px) {
-      header {
-        height: 80px; /* Pour les écrans avec encoche */
-        padding-top: 20px;
-      }
-    }
-
-    header img {
-      width: var(--logo-size);
-      height: var(--logo-size);
-      border-radius: var(--border-radius);
-      margin-right: 12px;
-      object-fit: contain;
-    }
-
-    header h1 {
-      font-size: var(--title-size); /* Taille légèrement plus grosse */
-      margin: 0;
-      font-weight: 600;
-      text-align: center;
-      color: white; /* Titre en blanc */
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    /* Style de la navigation */
-    nav {
-      background: var(--background-color);
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      position: fixed;
-      bottom: 0;
-      z-index: 999;
-      border-top: 1px solid var(--light-gray);
-      box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    nav button {
-      background: none;
-      border: none;
-      padding: 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: var(--text-color);
-      font-weight: 500;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: color 0.3s ease, background-color 0.3s ease;
-      position: relative;
-      border-radius: var(--border-radius);
-      width: 70px;
-      height: 100%;
-    }
-
-    nav button.active {
-      color: var(--primary-color);
-      background-color: var(--nav-active-bg);
-    }
-
-    nav button.active::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      width: 40%;
-      height: 3px;
-      background: var(--primary-color);
-      border-radius: 2px;
-    }
-
-    nav button i {
-      font-size: 24px;
-      margin-bottom: 3px;
-    }
-
-    /* Style des conteneurs */
-    .container {
-      max-width: 600px;
-      width: 90%;
-      margin-top: 100px;
-      margin-bottom: 120px; /* Augmenté pour éviter le chevauchement avec le nav */
-      padding: var(--section-padding);
-      background: var(--background-color);
-      border-radius: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-      display: none;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .container.active {
-      display: block;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    h2 {
-      color: var(--primary-color);
-      margin-bottom: var(--section-margin);
-      font-weight: 700;
-      font-size: 22px;
-      text-align: center;
-    }
-
-    /* Formulaires */
-    .form-group {
-      margin-bottom: 16px;
-      position: relative;
-    }
-
-    .form-group label {
-      font-size: 14px;
-      color: #999;
-      margin-bottom: 4px;
-      display: block;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      height: 44px;
-      padding: 0 16px;
-      border: 1px solid var(--input-border);
-      border-radius: var(--border-radius);
-      background-color: var(--input-background);
-      font-size: 16px;
-      box-sizing: border-box;
-      outline: none;
-      transition: border-color 0.3s ease, background-color 0.3s ease;
-    }
-
-    .form-group textarea {
-      height: auto;
-      min-height: 100px;
-      padding-top: 12px;
-      padding-bottom: 12px;
-      background-color: var(--upload-bg);
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary-color);
-      background-color: #fff;
-    }
-
-    /* Boutons */
-    .primary-btn {
-      width: 100%;
-      height: var(--button-height);
-      padding: var(--button-padding);
-      background-color: var(--primary-color);
-      color: #fff;
-      border: none;
-      border-radius: var(--border-radius);
-      font-size: var(--button-font-size);
-      font-weight: 700;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .primary-btn:hover {
-      background-color: var(--button-hover-color);
-      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .primary-btn:active {
-      background-color: var(--button-active-color);
-      transform: scale(0.98);
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .download-btn {
-      background-color: var(--button-download-color);
-      margin-top: var(--section-margin);
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .download-btn i {
-      margin-right: 8px;
-    }
-
-    /* Loader */
-    #loader {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20px;
-      font-size: 18px;
-      color: var(--primary-color);
-    }
-
-    /* Résultats */
-    .result {
-      background: var(--light-gray);
-      padding: var(--section-padding);
-      border-radius: 20px;
-      margin-top: 16px;
-      white-space: pre-wrap;
-      font-size: 16px;
-      line-height: 1.5;
-      color: var(--text-color);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .result strong {
-      font-weight: 700;
-    }
-
-    /* Séparateurs */
-    .separator {
-      margin: var(--section-margin) 0;
-      border-top: 1px solid var(--light-gray);
-    }
-
-    /* Prévisualisation des fichiers */
-    #filePreview div {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--upload-bg);
-      padding: 10px;
-      border-radius: var(--border-radius);
-      margin-top: 10px;
-    }
-
-    #filePreview button {
-      background: none;
-      border: none;
-      color: var(--error-color);
-      cursor: pointer;
-    }
-
-    /* Messages de confirmation */
-    .confirmation-message {
-      background-color: var(--confirmation-bg);
-      color: var(--confirmation-text-color);
-      padding: 10px 16px;
-      border-radius: var(--border-radius);
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      z-index: 1001;
-      display: none;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .confirmation-message.show {
-      display: flex;
-      animation: fadeInOut 3s forwards;
-    }
-
-    .confirmation-message i {
-      margin-right: 8px;
-    }
-
-    @keyframes fadeInOut {
-      0% {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-
-      10%,
-      90% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      100% {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-    }
-
-    /* Boxes d’avertissement */
-    .alert-warning {
-      background-color: #FFF9E0;
-      color: #1A1A1A;
-      padding: 10px 16px;
-      border-radius: var(--border-radius);
-      display: flex;
-      align-items: center;
-      margin-top: 16px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .alert-warning i {
-      margin-right: 8px;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      font-size: 12px;
-      color: #999;
-      padding: 10px 0;
-      position: fixed;
-      bottom: 60px; /* Positionner au-dessus de la barre de navigation */
-      width: 100%;
-      background: var(--background-color);
-      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-      z-index: 998;
-    }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      header {
-        height: 80px; /* Pour les écrans avec encoche */
-        padding-top: 20px;
-      }
-
-      header h1 {
-        font-size: 22pt; /* Ajustement pour une meilleure lisibilité */
-      }
-
-      h2 {
-        font-size: 20px;
-      }
-
-      .primary-btn {
-        font-size: 18px; /* Texte plus gros */
-      }
-
-      nav button i {
-        font-size: 20px;
-      }
-    }
+    /* Vos styles CSS ici */
   </style>
 </head>
 
@@ -661,17 +254,17 @@
               {
                 role: "user",
                 content: `
-      Patient:
-      - Genre : ${gender}
-      - Âge : ${age}
-      - Poids : ${weight}
-      - Taille : ${height}
-      - Sport : ${sport}
-      - Conditions médicales : ${conditions}
-      - Symptômes : ${symptoms}
-      
-      Tâche :
-      Génère un diagnostic précis et détaillé basé sur les informations ci-dessus. Fournis le rationnel du diagnostic, la probabilité estimée de chaque diagnostic possible, et recommande les tests de kinésithérapie ou autres examens médicaux nécessaires pour affiner ce diagnostic.
+Patient:
+- Genre : ${gender}
+- Âge : ${age}
+- Poids : ${weight}
+- Taille : ${height}
+- Sport : ${sport}
+- Conditions médicales : ${conditions}
+- Symptômes : ${symptoms}
+
+Tâche :
+Génère un diagnostic précis et détaillé basé sur les informations ci-dessus. Fournis le rationnel du diagnostic, la probabilité estimée de chaque diagnostic possible, et recommande les tests de kinésithérapie ou autres examens médicaux nécessaires pour affiner ce diagnostic.
                 `,
               },
             ],
@@ -742,13 +335,13 @@
           {
             role: "user",
             content: `
-      - Genre : ${gender}
-      - Âge : ${age}
-      - Poids : ${weight}
-      - Taille : ${height}
-      - Sport : ${sport}
-      - Conditions médicales spécifiques : ${conditions}
-      - Symptômes : ${symptoms}
+- Genre : ${gender}
+- Âge : ${age}
+- Poids : ${weight}
+- Taille : ${height}
+- Sport : ${sport}
+- Conditions médicales spécifiques : ${conditions}
+- Symptômes : ${symptoms}
             `,
           },
         ],
@@ -774,13 +367,13 @@
               {
                 role: "user",
                 content: `
-      - Genre : ${gender}
-      - Âge : ${age}
-      - Poids : ${weight}
-      - Taille : ${height}
-      - Sport : ${sport}
-      - Conditions médicales spécifiques : ${conditions}
-      - Symptômes : ${symptoms}
+- Genre : ${gender}
+- Âge : ${age}
+- Poids : ${weight}
+- Taille : ${height}
+- Sport : ${sport}
+- Conditions médicales spécifiques : ${conditions}
+- Symptômes : ${symptoms}
                 `,
               },
             ],
