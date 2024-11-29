@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>PhysioCare Pro</title>
+  <title>PhysioCare</title>
   <!-- Importation des polices -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Importation des icônes (Font Awesome pour cet exemple) -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     integrity="sha384-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Inclusion de l'éditeur de texte enrichi Quill -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <style>
     /* Variables CSS pour les couleurs */
     :root {
@@ -23,7 +23,7 @@
       --background-color: #FFFFFF;
       --text-color: #1C1C1E;
       --light-gray: #E0E0E0;
-      --input-background: #F4F4F4;
+      --input-background: #F7F7F7;
       --input-border: #D0D0D0;
       --button-hover-color: #007BCE;
       --button-active-color: #00477C;
@@ -32,6 +32,9 @@
       --section-padding: 16px;
       --section-margin: 24px;
       --border-radius: 8px;
+      --confirmation-bg: #E8F5E9;
+      --confirmation-text-color: #2E7D32;
+      --upload-bg: #FAFAFA;
     }
 
     /* Styles globaux */
@@ -41,7 +44,7 @@
       padding: 0;
       background: var(--background-color);
       color: var(--text-color);
-      font-family: 'Roboto', Arial, sans-serif;
+      font-family: 'Roboto Slab', 'Roboto', Arial, sans-serif;
       font-size: 16px;
       line-height: 1.5;
     }
@@ -51,7 +54,7 @@
       background: var(--primary-color);
       color: white;
       width: 100%;
-      padding: 15px 20px;
+      padding: 16px 20px;
       position: fixed;
       top: 0;
       z-index: 1000;
@@ -72,15 +75,16 @@
       margin: 0;
       font-weight: 600;
       text-align: center;
+      margin-top: 16px;
     }
 
     /* Style de la navigation */
     nav {
-      background: var(--card-background);
+      background: var(--background-color);
       width: 100%;
       display: flex;
       justify-content: space-around;
-      padding: 5px 0;
+      padding: 10px 0;
       position: fixed;
       bottom: 0;
       z-index: 999;
@@ -109,6 +113,16 @@
       background-color: var(--nav-active-bg);
     }
 
+    nav button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      width: 40%;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
     nav button i {
       font-size: 24px;
       margin-bottom: 3px;
@@ -121,7 +135,7 @@
       margin-top: 100px;
       margin-bottom: 100px;
       padding: var(--section-padding);
-      background: var(--card-background);
+      background: var(--background-color);
       border-radius: 20px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
       display: none;
@@ -186,6 +200,7 @@
       min-height: 100px;
       padding-top: 12px;
       padding-bottom: 12px;
+      background-color: var(--upload-bg);
     }
 
     .form-group input:focus,
@@ -226,6 +241,7 @@
     .download-btn {
       background-color: var(--button-download-color);
       margin-top: var(--section-margin);
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .download-btn i {
@@ -270,7 +286,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #F9F9F9;
+      background: var(--upload-bg);
       padding: 10px;
       border-radius: var(--border-radius);
       margin-top: 10px;
@@ -285,9 +301,9 @@
 
     /* Messages de confirmation */
     .confirmation-message {
-      background-color: var(--accent-color);
-      color: #fff;
-      padding: 10px;
+      background-color: var(--confirmation-bg);
+      color: var(--confirmation-text-color);
+      padding: 10px 16px;
       border-radius: var(--border-radius);
       position: fixed;
       top: 80px;
@@ -295,14 +311,31 @@
       z-index: 1001;
       display: none;
       align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .confirmation-message.show {
       display: flex;
+      animation: fadeInOut 3s forwards;
     }
 
     .confirmation-message i {
       margin-right: 8px;
+    }
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      10%, 90% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
     }
 
     /* Responsive */
@@ -318,6 +351,10 @@
       .primary-btn {
         font-size: 14px;
       }
+
+      nav button i {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -325,7 +362,7 @@
 <body>
   <header>
     <img src="logo.png" alt="Logo PhysioCare">
-    <h1>PhysioCare Pro</h1>
+    <h1>PhysioCare</h1>
   </header>
 
   <nav>
@@ -403,7 +440,6 @@
       <label for="conditions">Conditions Médicales Spécifiques</label>
       <textarea id="conditions" placeholder="Décrivez les conditions médicales spécifiques"></textarea>
     </div>
-
   </div>
 
   <!-- Étape 2 : Symptômes et Analyses Médicales -->
@@ -412,12 +448,14 @@
 
     <div class="form-group">
       <label for="symptoms">Symptômes</label>
-      <textarea id="symptoms" placeholder="Décrivez les symptômes du patient..."></textarea>
+      <textarea id="symptoms" placeholder="Décrivez les symptômes observés chez le patient..."></textarea>
     </div>
 
     <div class="form-group" style="text-align: center;">
-      <input type="file" id="fileInput" multiple accept="image/*,application/pdf">
-      <label for="fileInput"><i class="fas fa-upload"></i> Choisir les fichiers</label>
+      <input type="file" id="fileInput" multiple accept="image/*,application/pdf" style="display: none;">
+      <label for="fileInput" style="cursor: pointer;">
+        <i class="fas fa-upload"></i> Choisir les fichiers
+      </label>
       <div id="filePreview"></div>
     </div>
   </div>
@@ -473,7 +511,9 @@
         fileDiv.appendChild(removeBtn);
         filePreview.appendChild(fileDiv);
       });
-      showConfirmation("Fichier(s) téléchargé(s) avec succès");
+      if (fileInput.files.length > 0) {
+        showConfirmation("Fichier(s) téléchargé(s) avec succès");
+      }
     });
 
     function showConfirmation(message) {
@@ -546,7 +586,7 @@
 
         if (data && data.content) {
           const diagnosisText = data.content.trim();
-          diagnosisResult.textContent = diagnosisText;
+          diagnosisResult.innerHTML = formatDiagnosisText(diagnosisText);
           generateTreatmentPlan(gender, age, weight, height, sport, conditions, symptoms, diagnosisText);
           showConfirmation("Diagnostic généré avec succès");
         } else {
@@ -558,6 +598,18 @@
       } finally {
         loader.style.display = "none";
       }
+    }
+
+    // Fonction pour formater le texte du diagnostic avec des titres gras
+    function formatDiagnosisText(text) {
+      // Exemple simple de formatage, peut être amélioré selon le format de la réponse
+      const lines = text.split('\n').map(line => {
+        if (line.startsWith("Recommandations") || line.startsWith("Données Manquantes")) {
+          return `<strong>${line}</strong>`;
+        }
+        return line;
+      }).join('<br>');
+      return lines;
     }
 
     // Génération du plan de traitement
@@ -599,7 +651,7 @@ Tâche : Basé sur les informations ci-dessus, générez une **proposition théo
 
         if (data && data.content) {
           const treatmentText = data.content.trim();
-          treatmentPlan.textContent = treatmentText;
+          treatmentPlan.innerHTML = formatTreatmentPlan(treatmentText);
           showConfirmation("Plan de traitement généré avec succès");
         } else {
           throw new Error("Réponse inattendue de l'API.");
@@ -610,19 +662,39 @@ Tâche : Basé sur les informations ci-dessus, générez une **proposition théo
       }
     }
 
+    // Fonction pour formater le plan de traitement avec titres numérotés et icônes
+    function formatTreatmentPlan(text) {
+      const phases = text.split('\n').filter(line => line.trim() !== '');
+      let formatted = '';
+      phases.forEach((line, index) => {
+        formatted += `<div class="phase">
+                      <h3>Phase ${index + 1}</h3>
+                      <ul>
+                        <li>${line.replace(/^\*\*/, '').replace(/\*\*$/, '')}</li>
+                      </ul>
+                    </div>`;
+      });
+      return formatted;
+    }
+
     // Téléchargement du plan de traitement en PDF
     function downloadTreatmentPlanPDF() {
       const { jsPDF } = window.jspdf;
-      const treatmentPlanText = document.getElementById('treatmentPlan').innerText;
+      const treatmentPlanContent = document.getElementById('treatmentPlan').innerText;
 
       const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("Plan de Traitement Personnalisé", 10, 10);
-      doc.setFontSize(12);
-      doc.text(treatmentPlanText, 10, 20, { maxWidth: 180 });
-
-      doc.save("Plan_de_Traitement.pdf");
-      showConfirmation("Plan de traitement téléchargé avec succès");
+      // Ajout de l'en-tête avec le logo
+      const img = new Image();
+      img.src = 'logo.png';
+      img.onload = function () {
+        doc.addImage(img, 'PNG', 10, 10, 30, 30);
+        doc.setFontSize(18);
+        doc.text("Plan de Traitement Personnalisé", 50, 25);
+        doc.setFontSize(14);
+        doc.text(treatmentPlanContent, 10, 50, { maxWidth: 190 });
+        doc.save("Plan_de_Traitement.pdf");
+        showConfirmation("Plan de traitement téléchargé avec succès");
+      };
     }
   </script>
 </body>
