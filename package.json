@@ -6,6 +6,6 @@
     "tesseract.js": "^2.1.1",
     "pdf-lib": "^1.17.0",
     "form-data": "^4.0.0",
-    "formidable": "^1.2.2"
+    "busboy": "^1.6.0"
   }
 }
