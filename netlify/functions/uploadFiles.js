@@ -1,9 +1,10 @@
 const fetch = require('node-fetch');
-const multiparty = require('multiparty');
+const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
 const { createWorker } = require('tesseract.js');
+const formidable = require('formidable');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -14,7 +15,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const form = new multiparty.Form({ autoFiles: true });
+    const form = new formidable.IncomingForm();
     form.parse(event.body, async (err, fields, files) => {
       if (err) {
         throw new Error('Erreur lors du parsing des fichiers.');
@@ -103,16 +104,17 @@ async function extractTextFromFiles(files) {
   let extractedText = '';
 
   for (let file of files) {
-    const filePath = file.path;
+    const filePath = `/tmp/${file.name}`;
+    fs.writeFileSync(filePath, file.content);
 
-    if (file.type === 'application/pdf') {
+    if (file.mimetype === 'application/pdf') {
       const pdfDoc = await PDFDocument.load(fs.readFileSync(filePath));
       const pages = pdfDoc.getPages();
       for (let page of pages) {
         const { text } = await page.getTextContent();
         extractedText += text.items.map(item => item.str).join(' ') + ' ';
       }
-    } else if (file.type.startsWith('image/')) {
+    } else if (file.mimetype.startsWith('image/')) {
       const worker = await createWorker();
       await worker.load();
       await worker.loadLanguage('eng');
