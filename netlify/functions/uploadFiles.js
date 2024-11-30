@@ -83,7 +83,7 @@ exports.handler = async (event) => {
       };
     });
 
-    await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       event.body.pipe(busboy);
       busboy.on('error', (err) => reject(err));
       busboy.on('finish', () => resolve());
