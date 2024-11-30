@@ -32,7 +32,7 @@ exports.handler = async (event) => {
         'x-api-key': process.env.ANTHROPIC_API_KEY
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-haiku-latest',
         max_tokens: 7000,
         messages: [
           {
