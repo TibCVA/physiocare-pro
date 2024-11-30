@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
@@ -14,12 +13,8 @@ exports.handler = async (event) => {
   }
 
   try {
-    const formData = new FormData();
-    const files = JSON.parse(event.body).files;
-
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
-    }
+    const formData = await parseMultipartFormData(event);
+    const files = formData.files;
 
     const extractedText = await extractTextFromFiles(files);
 
@@ -103,8 +98,8 @@ async function extractTextFromFiles(files) {
   let extractedText = '';
 
   for (let file of files) {
-    const filePath = `/tmp/${file.name}`;
-    fs.writeFileSync(filePath, file.buffer);
+    const filePath = `/tmp/${file.filename}`;
+    fs.writeFileSync(filePath, file.content);
 
     if (file.mimetype === 'application/pdf') {
       const pdfDoc = await PDFDocument.load(fs.readFileSync(filePath));
@@ -127,4 +122,29 @@ async function extractTextFromFiles(files) {
   }
 
   return extractedText.trim();
+}
+
+// Fonction pour parser les données multipart/form-data
+async function parseMultipartFormData(event) {
+  const boundary = event.headers['content-type'].split('boundary=')[1];
+  const data = Buffer.from(event.body, 'base64');
+  const formData = {};
+
+  const parts = data.toString().split(`--${boundary}`).slice(1, -1);
+  for (let part of parts) {
+    const [headers, body] = part.split('\r\n\r\n');
+    const contentDisposition = headers.match(/Content-Disposition:.*?filename="(.*?)"/);
+    const contentType = headers.match(/Content-Type: (.*?)\r\n/);
+
+    if (contentDisposition) {
+      const filename = contentDisposition[1];
+      formData[filename] = {
+        filename,
+        mimetype: contentType[1],
+        content: body
+      };
+    }
+  }
+
+  return { files: Object.values(formData) };
 }
