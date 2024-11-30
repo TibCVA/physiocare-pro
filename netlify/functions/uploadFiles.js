@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const Busboy = require('busboy');
+const multiparty = require('multiparty');
 const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
@@ -14,16 +14,12 @@ exports.handler = async (event) => {
   }
 
   try {
-    const busboy = new Busboy({ headers: event.headers });
-    const files = [];
+    const form = new multiparty.Form({ autoFiles: true });
+    form.parse(event.body, async (err, fields, files) => {
+      if (err) {
+        throw new Error('Erreur lors du parsing des fichiers.');
+      }
 
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      const filepath = `/tmp/${filename}`;
-      file.pipe(fs.createWriteStream(filepath));
-      files.push({ fieldname, filepath, mimetype });
-    });
-
-    busboy.on('finish', async () => {
       const extractedText = await extractTextFromFiles(files);
 
       // Appel à l'API Claude avec le texte extrait
@@ -82,12 +78,6 @@ exports.handler = async (event) => {
         })
       };
     });
-
-    await new Promise((resolve, reject) => {
-      event.body.pipe(busboy);
-      busboy.on('error', (err) => reject(err));
-      busboy.on('finish', () => resolve());
-    });
   } catch (error) {
     console.error('Erreur complète:', error);
 
@@ -113,16 +103,16 @@ async function extractTextFromFiles(files) {
   let extractedText = '';
 
   for (let file of files) {
-    const filePath = file.filepath;
+    const filePath = file.path;
 
-    if (file.mimetype === 'application/pdf') {
+    if (file.type === 'application/pdf') {
       const pdfDoc = await PDFDocument.load(fs.readFileSync(filePath));
       const pages = pdfDoc.getPages();
       for (let page of pages) {
         const { text } = await page.getTextContent();
         extractedText += text.items.map(item => item.str).join(' ') + ' ';
       }
-    } else if (file.mimetype.startsWith('image/')) {
+    } else if (file.type.startsWith('image/')) {
       const worker = await createWorker();
       await worker.load();
       await worker.loadLanguage('eng');
