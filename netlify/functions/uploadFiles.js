@@ -1,10 +1,9 @@
 const fetch = require('node-fetch');
-const FormData = require('form-data');
+const { IncomingForm } = require('formidable');
 const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
 const { createWorker } = require('tesseract.js');
-const formidable = require('formidable');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -15,7 +14,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const form = new formidable.IncomingForm();
+    const form = new IncomingForm();
     form.parse(event.body, async (err, fields, files) => {
       if (err) {
         throw new Error('Erreur lors du parsing des fichiers.');
