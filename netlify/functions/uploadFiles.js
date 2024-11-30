@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { IncomingForm } = require('formidable');
+const Busboy = require('busboy');
 const fs = require('fs');
 const path = require('path');
 const { PDFDocument } = require('pdf-lib');
@@ -14,12 +14,16 @@ exports.handler = async (event) => {
   }
 
   try {
-    const form = new IncomingForm();
-    form.parse(event.body, async (err, fields, files) => {
-      if (err) {
-        throw new Error('Erreur lors du parsing des fichiers.');
-      }
+    const busboy = Busboy({ headers: event.headers });
+    const files = [];
 
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+      const filepath = `/tmp/${filename}`;
+      file.pipe(fs.createWriteStream(filepath));
+      files.push({ fieldname, filepath, mimetype });
+    });
+
+    busboy.on('finish', async () => {
       const extractedText = await extractTextFromFiles(files);
 
       // Appel à l'API Claude avec le texte extrait
@@ -78,6 +82,12 @@ exports.handler = async (event) => {
         })
       };
     });
+
+    await new Promise((resolve, reject) => {
+      event.body.pipe(busboy);
+      busboy.on('error', (err) => reject(err));
+      busboy.on('finish', () => resolve());
+    });
   } catch (error) {
     console.error('Erreur complète:', error);
 
@@ -103,8 +113,7 @@ async function extractTextFromFiles(files) {
   let extractedText = '';
 
   for (let file of files) {
-    const filePath = `/tmp/${file.name}`;
-    fs.writeFileSync(filePath, file.content);
+    const filePath = file.filepath;
 
     if (file.mimetype === 'application/pdf') {
       const pdfDoc = await PDFDocument.load(fs.readFileSync(filePath));
