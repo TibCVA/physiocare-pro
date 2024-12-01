@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
+const path = require('path');
 const { createWorker } = require('tesseract.js');
 const pdfParse = require('pdf-parse');
 const parser = require('lambda-multipart-parser');
@@ -110,6 +111,10 @@ exports.handler = async (event, context) => {
 async function extractTextFromFiles(files) {
   let extractedText = '';
 
+  // Configuration des chemins pour les workers et core
+  const workerPath = path.join(__dirname, 'node_modules', 'tesseract.js', 'dist', 'worker.min.js');
+  const langPath = path.join(__dirname, 'node_modules', 'tesseract.js', 'lang-data');
+
   for (let file of files) {
     const filePath = `/tmp/${file.filename}`;
 
@@ -124,9 +129,14 @@ async function extractTextFromFiles(files) {
         extractedText += pdfData.text + ' ';
         console.log(`Texte extrait du PDF ${file.filename}`);
       } else if (file.contentType.startsWith('image/')) {
-        const worker = await createWorker();
+        const worker = createWorker({
+          logger: m => console.log(m),
+          workerPath: workerPath,
+          langPath: langPath,
+        });
+
         await worker.load();
-        await worker.loadLanguage('eng'); // Assurez-vous que la langue est correcte
+        await worker.loadLanguage('eng');
         await worker.initialize('eng');
         const { data: { text } } = await worker.recognize(filePath);
         extractedText += text + ' ';
