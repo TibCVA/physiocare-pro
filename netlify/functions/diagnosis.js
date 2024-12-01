@@ -40,8 +40,8 @@ exports.handler = async (event) => {
     Fournissez un diagnostic concis en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements.
     `;
 
-    // Clé API en dur
-    const ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY'; // Remplacez par votre clé API réelle
+    // Clés API en dur
+    const anthropicApiKey = 'YOUR_ANTHROPIC_API_KEY'; // Remplacez par votre clé API Anthropic
 
     // Appel à l'API Claude
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -49,7 +49,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
-        'x-api-key': ANTHROPIC_API_KEY, // Clé API en dur
+        'x-api-key': anthropicApiKey, // Clé API en dur
       },
       body: JSON.stringify({
         model: 'claude-3-5-haiku-latest',
