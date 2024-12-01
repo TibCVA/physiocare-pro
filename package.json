@@ -6,6 +6,7 @@
     "tesseract.js": "^2.1.1",
     "pdf-lib": "^1.17.0",
     "form-data": "^4.0.0",
-    "busboy": "^1.6.0"
+    "busboy": "^1.6.0",
+    "streamifier": "^0.1.1"  // Ajoutez cette ligne
   }
 }
