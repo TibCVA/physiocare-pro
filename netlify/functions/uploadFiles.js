@@ -13,25 +13,16 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Log des en-têtes pour débogage
-    console.log('Headers:', event.headers);
-
+    // Vérifier le Content-Type
     const contentType = event.headers['content-type'] || event.headers['Content-Type'];
     if (!contentType || !contentType.startsWith('multipart/form-data')) {
       throw new Error('Content-Type doit être multipart/form-data');
     }
 
-    const isBase64 = event.isBase64Encoded;
-    const bodyBuffer = isBase64 ? Buffer.from(event.body, 'base64') : Buffer.from(event.body, 'utf8');
-
-    // Log de la taille du body
-    console.log('Body Length:', bodyBuffer.length);
-
     // Parser les données multipart/form-data
     const result = await parser.parse(event);
-
-    const files = result.files; // Liste des fichiers téléchargés
-    const fields = result.fields; // Liste des champs non-fichiers
+    const files = result.files;
+    const fields = result.fields;
 
     console.log('Champs:', fields);
     console.log('Fichiers:', files);
@@ -122,21 +113,17 @@ async function extractTextFromFiles(files) {
   for (let file of files) {
     const filePath = `/tmp/${file.filename}`;
 
-    // Écrire le fichier temporaire
-    fs.writeFileSync(filePath, file.content);
-    console.log(`Fichier écrit temporairement à ${filePath}`);
+    try {
+      // Écrire le fichier temporaire
+      fs.writeFileSync(filePath, file.content);
+      console.log(`Fichier écrit temporairement à ${filePath}`);
 
-    if (file.contentType === 'application/pdf') {
-      try {
+      if (file.contentType === 'application/pdf') {
         const dataBuffer = fs.readFileSync(filePath);
         const pdfData = await pdfParse(dataBuffer);
         extractedText += pdfData.text + ' ';
         console.log(`Texte extrait du PDF ${file.filename}`);
-      } catch (err) {
-        console.error(`Erreur lors de l'extraction du PDF ${file.filename}:`, err);
-      }
-    } else if (file.contentType.startsWith('image/')) {
-      try {
+      } else if (file.contentType.startsWith('image/')) {
         const worker = await createWorker();
         await worker.load();
         await worker.loadLanguage('eng'); // Assurez-vous que la langue est correcte
@@ -145,14 +132,15 @@ async function extractTextFromFiles(files) {
         extractedText += text + ' ';
         await worker.terminate();
         console.log(`Texte extrait de l'image ${file.filename}`);
-      } catch (err) {
-        console.error(`Erreur lors de l'extraction de l'image ${file.filename}:`, err);
       }
-    }
 
-    // Supprimer le fichier temporaire après traitement
-    fs.unlinkSync(filePath);
-    console.log(`Fichier temporaire supprimé: ${filePath}`);
+      // Supprimer le fichier temporaire après traitement
+      fs.unlinkSync(filePath);
+      console.log(`Fichier temporaire supprimé: ${filePath}`);
+    } catch (err) {
+      console.error(`Erreur lors du traitement du fichier ${file.filename}:`, err);
+      // Continue avec le prochain fichier sans interrompre le processus
+    }
   }
 
   return extractedText.trim();
