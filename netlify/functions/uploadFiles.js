@@ -1,9 +1,8 @@
 const fetch = require('node-fetch');
-const formidable = require('formidable');
 const fs = require('fs');
 const { createWorker } = require('tesseract.js');
 const pdfParse = require('pdf-parse');
-const stream = require('stream');
+const parser = require('aws-lambda-multipart-parser');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -14,52 +13,27 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Log the headers to inspect them
-    console.log('Headers:', event.headers);
-
+    // Vérifier si le type de contenu est multipart/form-data
     const contentType = event.headers['content-type'] || event.headers['Content-Type'];
-    if (!contentType) {
-      console.error('No content-type header found.');
-      throw new Error('Missing content-type header.');
+    if (!contentType || !contentType.startsWith('multipart/form-data')) {
+      throw new Error('Content-Type doit être multipart/form-data');
     }
 
-    const isBase64 = event.isBase64Encoded;
+    // Parser les données multipart/form-data
+    const result = parser.parse(event, true); // true pour inclure les fichiers dans result.files
 
-    // Convert body to buffer
-    const buffer = isBase64 ? Buffer.from(event.body, 'base64') : Buffer.from(event.body, 'utf8');
+    const files = result.files; // Liste des fichiers téléchargés
+    const fields = result.fields; // Liste des champs non-fichiers
 
-    // Create a readable stream from the buffer
-    const readable = new stream.PassThrough();
-    readable.end(buffer);
+    console.log('Champs:', fields);
+    console.log('Fichiers:', files);
 
-    // Create a new instance of formidable.IncomingForm
-    const form = new formidable.IncomingForm();
+    if (files.length === 0) {
+      throw new Error('Aucun fichier téléchargé.');
+    }
 
-    // Manually set headers including 'content-length'
-    const contentLength = buffer.length;
-    const headers = {
-      'content-type': contentType,
-      'content-length': contentLength.toString(),
-    };
-    form.headers = headers;
-
-    // Parse the form
-    const parsed = await new Promise((resolve, reject) => {
-      form.parse(readable, (err, fields, files) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ fields, files });
-        }
-      });
-    });
-
-    // Log parsed fields and files
-    console.log('Parsed Fields:', parsed.fields);
-    console.log('Parsed Files:', parsed.files);
-
-    // Process the files to extract text
-    const extractedText = await extractTextFromFiles(parsed.files);
+    // Traiter les fichiers pour extraire le texte
+    const extractedText = await extractTextFromFiles(files);
     console.log('Texte extrait:', extractedText);
 
     // Appel à l'API Claude avec le texte extrait
@@ -137,11 +111,13 @@ exports.handler = async (event, context) => {
 async function extractTextFromFiles(files) {
   let extractedText = '';
 
-  for (let key in files) {
-    const file = files[key];
-    const filePath = file.filepath;
+  for (let file of files) {
+    const filePath = `/tmp/${file.filename}`;
 
-    if (file.mimetype === 'application/pdf') {
+    // Écrire le fichier temporaire
+    fs.writeFileSync(filePath, file.content);
+
+    if (file.contentType === 'application/pdf') {
       try {
         const dataBuffer = fs.readFileSync(filePath);
         const pdfData = await pdfParse(dataBuffer);
@@ -149,11 +125,11 @@ async function extractTextFromFiles(files) {
       } catch (err) {
         console.error('Erreur lors de l\'extraction du PDF:', err);
       }
-    } else if (file.mimetype.startsWith('image/')) {
+    } else if (file.contentType.startsWith('image/')) {
       try {
         const worker = await createWorker();
         await worker.load();
-        await worker.loadLanguage('eng');
+        await worker.loadLanguage('eng'); // Assurez-vous que la langue est correcte
         await worker.initialize('eng');
         const { data: { text } } = await worker.recognize(filePath);
         extractedText += text + ' ';
@@ -163,7 +139,8 @@ async function extractTextFromFiles(files) {
       }
     }
 
-    fs.unlinkSync(filePath); // Supprimer le fichier temporaire après traitement
+    // Supprimer le fichier temporaire après traitement
+    fs.unlinkSync(filePath);
   }
 
   return extractedText.trim();
