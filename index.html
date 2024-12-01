@@ -159,14 +159,14 @@
     let ocrText = ''; // Variable pour stocker le texte OCR extrait
 
     // Prévisualisation des fichiers téléchargés
-    const fileInput = document.getElementById('fileInput');
+    const fileInputElement = document.getElementById('fileInput');
     const filePreview = document.getElementById('filePreview');
     const confirmationMessage = document.getElementById('confirmationMessage');
     const confirmationText = document.getElementById('confirmationText');
 
-    fileInput.addEventListener('change', () => {
+    fileInputElement.addEventListener('change', () => {
       filePreview.innerHTML = '';
-      Array.from(fileInput.files).forEach(file => {
+      Array.from(fileInputElement.files).forEach(file => {
         const fileDiv = document.createElement('div');
         fileDiv.textContent = file.name;
         const removeBtn = document.createElement('button');
@@ -175,18 +175,18 @@
           fileDiv.remove();
           // Retirer le fichier de l'input
           const dt = new DataTransfer();
-          Array.from(fileInput.files)
+          Array.from(fileInputElement.files)
             .filter(f => f !== file)
             .forEach(f => dt.items.add(f));
-          fileInput.files = dt.files;
-          if (fileInput.files.length === 0) {
+          fileInputElement.files = dt.files;
+          if (fileInputElement.files.length === 0) {
             showConfirmation("Tous les fichiers ont été supprimés");
           }
         };
         fileDiv.appendChild(removeBtn);
         filePreview.appendChild(fileDiv);
       });
-      if (fileInput.files.length > 0) {
+      if (fileInputElement.files.length > 0) {
         showConfirmation("Fichier(s) téléchargé(s) avec succès");
       }
     });
@@ -218,6 +218,10 @@
 
     // Confirmation et génération du diagnostic
     function confirmGenerateDiagnosis() {
+      if (ocrText === '') {
+        const proceed = confirm("Aucune analyse OCR n'a été réalisée. Voulez-vous tout de même générer le diagnostic ?");
+        if (!proceed) return;
+      }
       if (confirm("Voulez-vous vraiment générer le diagnostic avec les informations fournies ?")) {
         generateDiagnosis();
       }
@@ -267,7 +271,7 @@
               - Conditions Médicales Spécifiques : ${conditions}
             `,
             symptoms: symptoms,
-            ocrText: ocrText
+            ocrText: ocrText // Peut être vide
           }),
         });
 
@@ -350,7 +354,7 @@
               - Conditions Médicales Spécifiques : ${conditions}
             `,
             symptoms: symptoms,
-            diagnostic: diagnosis
+            diagnostic: diagnosis // Inclure le diagnostic
           }),
         });
 
