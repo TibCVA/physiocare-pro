@@ -5,7 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["streamifier", "pdf-parse"]  # Retirez "busboy" de cette liste
+  external_node_modules = ["streamifier", "pdf-parse", "formidable"]  # Ajoutez "formidable" ici
 
 [[redirects]]
   from = "/*"
