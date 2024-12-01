@@ -10,5 +10,8 @@
     "streamifier": "^0.1.1",
     "pdf-parse": "^1.1.1",
     "formidable": "^2.0.1"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
