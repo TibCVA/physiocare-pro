@@ -9,6 +9,6 @@
     "busboy": "^1.6.0",
     "streamifier": "^0.1.1",
     "pdf-parse": "^1.1.1",
-    "formidable": "^2.0.1"  // Ajoutez cette ligne
+    "formidable": "^2.0.1"
   }
 }
