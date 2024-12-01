@@ -2,8 +2,7 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const { createWorker } = require('tesseract.js');
 const pdfParse = require('pdf-parse');
-const parser = require('aws-lambda-multipart-parser');
-const { PassThrough } = require('stream');
+const parser = require('lambda-multipart-parser');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -25,14 +24,11 @@ exports.handler = async (event, context) => {
     const isBase64 = event.isBase64Encoded;
     const bodyBuffer = isBase64 ? Buffer.from(event.body, 'base64') : Buffer.from(event.body, 'utf8');
 
-    // Vérifier et définir 'content-length' si absent
-    if (!event.headers['content-length'] && !event.headers['Content-Length']) {
-      event.headers['content-length'] = bodyBuffer.length.toString();
-      console.log('Content-Length défini manuellement:', event.headers['content-length']);
-    }
+    // Log de la taille du body
+    console.log('Body Length:', bodyBuffer.length);
 
     // Parser les données multipart/form-data
-    const result = parser.parse(event, true); // true pour inclure les fichiers dans result.files
+    const result = await parser.parse(event);
 
     const files = result.files; // Liste des fichiers téléchargés
     const fields = result.fields; // Liste des champs non-fichiers
