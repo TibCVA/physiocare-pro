@@ -3,7 +3,7 @@ const formidable = require('formidable');
 const fs = require('fs');
 const { createWorker } = require('tesseract.js');
 const pdfParse = require('pdf-parse');
-const { Readable } = require('stream');
+const stream = require('stream');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -14,50 +14,52 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Log the headers to inspect them
+    console.log('Headers:', event.headers);
+
     const contentType = event.headers['content-type'] || event.headers['Content-Type'];
+    if (!contentType) {
+      console.error('No content-type header found.');
+      throw new Error('Missing content-type header.');
+    }
+
     const isBase64 = event.isBase64Encoded;
 
+    // Convert body to buffer
     const buffer = isBase64 ? Buffer.from(event.body, 'base64') : Buffer.from(event.body, 'utf8');
 
-    const stream = Readable.from(buffer);
+    // Create a readable stream from the buffer
+    const readable = new stream.PassThrough();
+    readable.end(buffer);
 
+    // Create a new instance of formidable.IncomingForm
     const form = new formidable.IncomingForm();
 
-    // Manuellement définir les en-têtes nécessaires
-    form.headers = { 'content-type': contentType };
+    // Manually set headers including 'content-length'
+    const contentLength = buffer.length;
+    const headers = {
+      'content-type': contentType,
+      'content-length': contentLength.toString(),
+    };
+    form.headers = headers;
 
-    const files = [];
-    const fields = {};
-
-    // Formidable ne retourne pas de promesse, nous devons envelopper en Promise
+    // Parse the form
     const parsed = await new Promise((resolve, reject) => {
-      form.parse(stream, (err, parsedFields, parsedFiles) => {
+      form.parse(readable, (err, fields, files) => {
         if (err) {
           reject(err);
         } else {
-          resolve({ parsedFields, parsedFiles });
+          resolve({ fields, files });
         }
       });
     });
 
-    // Collecter les fichiers
-    for (const key in parsed.parsedFiles) {
-      const file = parsed.parsedFiles[key];
-      files.push({
-        fieldname: key,
-        filepath: file.filepath,
-        mimetype: file.mimetype,
-        filename: file.originalFilename,
-      });
-    }
+    // Log parsed fields and files
+    console.log('Parsed Fields:', parsed.fields);
+    console.log('Parsed Files:', parsed.files);
 
-    // Collecter les champs
-    for (const key in parsed.parsedFields) {
-      fields[key] = parsed.parsedFields[key];
-    }
-
-    // Traiter les fichiers
-    const extractedText = await extractTextFromFiles(files);
+    // Process the files to extract text
+    const extractedText = await extractTextFromFiles(parsed.files);
     console.log('Texte extrait:', extractedText);
 
     // Appel à l'API Claude avec le texte extrait
@@ -135,7 +137,8 @@ exports.handler = async (event, context) => {
 async function extractTextFromFiles(files) {
   let extractedText = '';
 
-  for (let file of files) {
+  for (let key in files) {
+    const file = files[key];
     const filePath = file.filepath;
 
     if (file.mimetype === 'application/pdf') {
@@ -150,7 +153,7 @@ async function extractTextFromFiles(files) {
       try {
         const worker = await createWorker();
         await worker.load();
-        await worker.loadLanguage('eng'); // Assurez-vous que la langue est correcte
+        await worker.loadLanguage('eng');
         await worker.initialize('eng');
         const { data: { text } } = await worker.recognize(filePath);
         extractedText += text + ' ';
@@ -160,7 +163,7 @@ async function extractTextFromFiles(files) {
       }
     }
 
-    fs.unlinkSync(filePath); // Supprimez le fichier temporaire après traitement
+    fs.unlinkSync(filePath); // Supprimer le fichier temporaire après traitement
   }
 
   return extractedText.trim();
