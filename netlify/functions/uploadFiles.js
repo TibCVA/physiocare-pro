@@ -1,9 +1,9 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
-const { createWorker } = require('tesseract.js');
 const pdfParse = require('pdf-parse');
 const parser = require('lambda-multipart-parser');
+const FormData = require('form-data');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -111,10 +111,6 @@ exports.handler = async (event, context) => {
 async function extractTextFromFiles(files) {
   let extractedText = '';
 
-  // Configuration des chemins pour les workers et core
-  const workerPath = path.join(__dirname, '..', 'node_modules', 'tesseract.js', 'dist', 'worker.min.js');
-  const langPath = path.join(__dirname, '..', 'node_modules', 'tesseract.js', 'lang-data');
-
   for (let file of files) {
     const filePath = `/tmp/${file.filename}`;
 
@@ -129,18 +125,9 @@ async function extractTextFromFiles(files) {
         extractedText += pdfData.text + ' ';
         console.log(`Texte extrait du PDF ${file.filename}`);
       } else if (file.contentType.startsWith('image/')) {
-        const worker = createWorker({
-          logger: m => console.log(m),
-          workerPath: workerPath,
-          langPath: langPath,
-        });
-
-        await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
-        const { data: { text } } = await worker.recognize(filePath);
-        extractedText += text + ' ';
-        await worker.terminate();
+        // Envoyer l'image à OCR.space pour l'OCR
+        const ocrText = await performOCR(filePath);
+        extractedText += ocrText + ' ';
         console.log(`Texte extrait de l'image ${file.filename}`);
       }
 
@@ -154,4 +141,38 @@ async function extractTextFromFiles(files) {
   }
 
   return extractedText.trim();
+}
+
+async function performOCR(filePath) {
+  const ocrApiKey = process.env.OCR_SPACE_API_KEY; // Assurez-vous de définir cette variable d'environnement
+
+  if (!ocrApiKey) {
+    throw new Error('La clé API OCR.space n\'est pas définie.');
+  }
+
+  const form = new FormData();
+  form.append('apikey', ocrApiKey);
+  form.append('language', 'eng'); // Ajustez la langue si nécessaire
+  form.append('file', fs.createReadStream(filePath));
+  form.append('isOverlayRequired', 'false');
+
+  try {
+    const response = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      body: form,
+    });
+
+    const data = await response.json();
+
+    if (data.IsErroredOnProcessing) {
+      console.error('Erreur OCR.space:', data.ErrorMessage);
+      throw new Error('Erreur lors de l\'extraction du texte avec OCR.space.');
+    }
+
+    const parsedText = data.ParsedResults[0].ParsedText;
+    return parsedText;
+  } catch (error) {
+    console.error('Erreur lors de la communication avec OCR.space:', error);
+    throw new Error('Erreur lors de la communication avec le service OCR.');
+  }
 }
