@@ -1,10 +1,10 @@
 const fetch = require('node-fetch');
-const Busboy = require('busboy'); // Assurez-vous que Busboy est importé correctement
+const Busboy = require('busboy'); // Import correct de Busboy
 const fs = require('fs');
 const path = require('path');
 const { createWorker } = require('tesseract.js');
 const streamifier = require('streamifier');
-const pdfParse = require('pdf-parse'); // Importez pdf-parse
+const pdfParse = require('pdf-parse'); // Import de pdf-parse
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const busboy = new Busboy({ headers: event.headers }); // Utilisez 'new Busboy'
+    const busboy = new Busboy({ headers: event.headers }); // Utilisation correcte de Busboy
     const files = [];
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
