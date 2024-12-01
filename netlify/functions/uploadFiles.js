@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const Busboy = require('busboy');
+const Busboy = require('busboy'); // Assurez-vous que Busboy est importé correctement
 const fs = require('fs');
 const path = require('path');
 const { createWorker } = require('tesseract.js');
@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const busboy = new Busboy({ headers: event.headers });
+    const busboy = new Busboy({ headers: event.headers }); // Utilisez 'new Busboy'
     const files = [];
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
