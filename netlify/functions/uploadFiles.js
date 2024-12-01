@@ -3,6 +3,7 @@ const fs = require('fs');
 const { createWorker } = require('tesseract.js');
 const pdfParse = require('pdf-parse');
 const parser = require('aws-lambda-multipart-parser');
+const { PassThrough } = require('stream');
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -13,10 +14,21 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Vérifier si le type de contenu est multipart/form-data
+    // Log des en-têtes pour débogage
+    console.log('Headers:', event.headers);
+
     const contentType = event.headers['content-type'] || event.headers['Content-Type'];
     if (!contentType || !contentType.startsWith('multipart/form-data')) {
       throw new Error('Content-Type doit être multipart/form-data');
+    }
+
+    const isBase64 = event.isBase64Encoded;
+    const bodyBuffer = isBase64 ? Buffer.from(event.body, 'base64') : Buffer.from(event.body, 'utf8');
+
+    // Vérifier et définir 'content-length' si absent
+    if (!event.headers['content-length'] && !event.headers['Content-Length']) {
+      event.headers['content-length'] = bodyBuffer.length.toString();
+      console.log('Content-Length défini manuellement:', event.headers['content-length']);
     }
 
     // Parser les données multipart/form-data
@@ -28,7 +40,7 @@ exports.handler = async (event, context) => {
     console.log('Champs:', fields);
     console.log('Fichiers:', files);
 
-    if (files.length === 0) {
+    if (!files || files.length === 0) {
       throw new Error('Aucun fichier téléchargé.');
     }
 
@@ -116,14 +128,16 @@ async function extractTextFromFiles(files) {
 
     // Écrire le fichier temporaire
     fs.writeFileSync(filePath, file.content);
+    console.log(`Fichier écrit temporairement à ${filePath}`);
 
     if (file.contentType === 'application/pdf') {
       try {
         const dataBuffer = fs.readFileSync(filePath);
         const pdfData = await pdfParse(dataBuffer);
         extractedText += pdfData.text + ' ';
+        console.log(`Texte extrait du PDF ${file.filename}`);
       } catch (err) {
-        console.error('Erreur lors de l\'extraction du PDF:', err);
+        console.error(`Erreur lors de l'extraction du PDF ${file.filename}:`, err);
       }
     } else if (file.contentType.startsWith('image/')) {
       try {
@@ -134,13 +148,15 @@ async function extractTextFromFiles(files) {
         const { data: { text } } = await worker.recognize(filePath);
         extractedText += text + ' ';
         await worker.terminate();
+        console.log(`Texte extrait de l'image ${file.filename}`);
       } catch (err) {
-        console.error('Erreur lors de l\'extraction de l\'image:', err);
+        console.error(`Erreur lors de l'extraction de l'image ${file.filename}:`, err);
       }
     }
 
     // Supprimer le fichier temporaire après traitement
     fs.unlinkSync(filePath);
+    console.log(`Fichier temporaire supprimé: ${filePath}`);
   }
 
   return extractedText.trim();
