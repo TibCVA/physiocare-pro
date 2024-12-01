@@ -17,20 +17,27 @@ exports.handler = async (event) => {
     const { profile, symptoms, ocrText } = requestData;
 
     // Validation des données d'entrée
-    if (!profile || !symptoms || !ocrText) {
+    if (!profile || !symptoms) { // ocrText est maintenant optionnel
       throw new Error(
-        'Données d’entrée invalides. Assurez-vous de fournir un profil, des symptômes et du texte OCR.'
+        'Données d’entrée invalides. Assurez-vous de fournir un profil et des symptômes.'
       );
     }
 
     // Construction du prompt complet
-    const prompt = `
+    let prompt = `
       Basé sur les informations suivantes :
       - Profil du patient : "${profile}"
       - Symptômes : "${symptoms}"
+    `;
+
+    if (ocrText && ocrText.trim() !== '') {
+      prompt += `
       - Résultats de l’analyse OCR : "${ocrText}"
-      
-      Fournissez un diagnostic concis en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements.
+      `;
+    }
+
+    prompt += `
+    Fournissez un diagnostic concis en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements.
     `;
 
     // Appel à l'API Claude
@@ -39,7 +46,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
-        'x-api-key': 'VOTRE_CLE_API_CLAUDE', // Remplacez ceci par votre clé API Claude
+        'x-api-key': process.env.ANTHROPIC_API_KEY, // Utilisation de la variable d'environnement
       },
       body: JSON.stringify({
         model: 'claude-3-5-haiku-latest',
