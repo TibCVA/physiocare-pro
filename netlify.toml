@@ -5,7 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["streamifier", "pdf-parse"]  # Retirez "busboy", "formidable", et "aws-lambda-multipart-parser"
+  external_node_modules = ["streamifier", "pdf-parse"]  # Exclure les autres modules
 
 [[redirects]]
   from = "/*"
