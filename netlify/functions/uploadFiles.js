@@ -1,13 +1,8 @@
-// netlify/functions/uploadFiles.js
+// netlify/functions/diagnosis.js
 
 const fetch = require('node-fetch');
-const fs = require('fs');
-const path = require('path');
-const pdfParse = require('pdf-parse');
-const parser = require('lambda-multipart-parser');
-const FormData = require('form-data');
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -16,29 +11,79 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Vérifier le Content-Type
-    const contentType = event.headers['content-type'] || event.headers['Content-Type'];
-    if (!contentType || !contentType.startsWith('multipart/form-data')) {
-      throw new Error('Content-Type doit être multipart/form-data');
+    const requestData = JSON.parse(event.body);
+
+    // Extraction des données d'entrée
+    const { profile, symptoms, ocrText } = requestData;
+
+    // Validation des données d'entrée
+    if (!profile || !symptoms) { // ocrText est maintenant optionnel
+      throw new Error(
+        'Données d’entrée invalides. Assurez-vous de fournir un profil et des symptômes.'
+      );
     }
 
-    // Parser les données multipart/form-data
-    const result = await parser.parse(event);
-    const files = result.files;
-    const fields = result.fields;
+    // Construction du prompt complet
+    let prompt = `
+      Basé sur les informations suivantes :
+      - Profil du patient : "${profile}"
+      - Symptômes : "${symptoms}"
+    `;
 
-    console.log('Champs:', fields);
-    console.log('Fichiers:', files);
-
-    if (!files || files.length === 0) {
-      throw new Error('Aucun fichier téléchargé.');
+    if (ocrText && ocrText.trim() !== '') {
+      prompt += `
+      - Résultats de l’analyse OCR : "${ocrText}"
+      `;
     }
 
-    // Traiter les fichiers pour extraire le texte
-    const extractedText = await extractTextFromFiles(files);
-    console.log('Texte extrait:', extractedText);
+    prompt += `
+    Fournissez un diagnostic concis en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements.
+    `;
 
-    // Retourner le texte extrait
+    // Clés API en dur
+    const anthropicApiKey = 'YOUR_ANTHROPIC_API_KEY'; // Remplacez par votre clé API Anthropic
+
+    // Appel à l'API Claude
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'x-api-key': anthropicApiKey, // Clé API en dur
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-latest',
+        max_tokens: 7000,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!claudeResponse.ok) {
+      const errorText = await claudeResponse.text();
+      console.error(`Erreur Claude API: ${errorText}`);
+      throw new Error(`Claude API error: ${claudeResponse.statusText}`);
+    }
+
+    const claudeData = await claudeResponse.json();
+    console.log('Claude API Réponse complète :', claudeData);
+
+    // Vérification renforcée de la réponse
+    const diagnosis =
+      claudeData.content &&
+      Array.isArray(claudeData.content) &&
+      claudeData.content[0]?.text?.trim();
+
+    if (!diagnosis) {
+      console.error('La réponse Claude est mal formée ou vide.', claudeData);
+      throw new Error('Pas de diagnostic disponible.');
+    }
+
+    // Retour du diagnostic
     return {
       statusCode: 200,
       headers: {
@@ -46,7 +91,7 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({
-        ocrText: extractedText,
+        content: diagnosis,
       }),
     };
   } catch (error) {
@@ -69,73 +114,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-
-async function extractTextFromFiles(files) {
-  let extractedText = '';
-
-  // Clé API en dur
-  const OCR_SPACE_API_KEY = 'YOUR_OCR_SPACE_API_KEY'; // Remplacez par votre clé API réelle
-
-  for (let file of files) {
-    const filePath = `/tmp/${file.filename}`;
-
-    try {
-      // Écrire le fichier temporaire
-      fs.writeFileSync(filePath, file.content);
-      console.log(`Fichier écrit temporairement à ${filePath}`);
-
-      if (file.contentType === 'application/pdf') {
-        const dataBuffer = fs.readFileSync(filePath);
-        const pdfData = await pdfParse(dataBuffer);
-        extractedText += pdfData.text + ' ';
-        console.log(`Texte extrait du PDF ${file.filename}`);
-      } else if (file.contentType.startsWith('image/')) {
-        // Envoyer l'image à OCR.space pour l'OCR
-        const ocrText = await performOCR(filePath, OCR_SPACE_API_KEY);
-        extractedText += ocrText + ' ';
-        console.log(`Texte extrait de l'image ${file.filename}`);
-      }
-
-      // Supprimer le fichier temporaire après traitement
-      fs.unlinkSync(filePath);
-      console.log(`Fichier temporaire supprimé: ${filePath}`);
-    } catch (err) {
-      console.error(`Erreur lors du traitement du fichier ${file.filename}:`, err);
-      // Continue avec le prochain fichier sans interrompre le processus
-    }
-  }
-
-  return extractedText.trim();
-}
-
-async function performOCR(filePath, ocrApiKey) {
-  if (!ocrApiKey) {
-    throw new Error('La clé API OCR.space n\'est pas définie.');
-  }
-
-  const form = new FormData();
-  form.append('apikey', ocrApiKey);
-  form.append('language', 'eng'); // Ajustez la langue si nécessaire
-  form.append('file', fs.createReadStream(filePath));
-  form.append('isOverlayRequired', 'false');
-
-  try {
-    const response = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      body: form,
-    });
-
-    const data = await response.json();
-
-    if (data.IsErroredOnProcessing) {
-      console.error('Erreur OCR.space:', data.ErrorMessage);
-      throw new Error('Erreur lors de l\'extraction du texte avec OCR.space.');
-    }
-
-    const parsedText = data.ParsedResults[0].ParsedText;
-    return parsedText;
-  } catch (error) {
-    console.error('Erreur lors de la communication avec OCR.space:', error);
-    throw new Error('Erreur lors de la communication avec le service OCR.');
-  }
-}
