@@ -112,8 +112,8 @@ async function extractTextFromFiles(files) {
   let extractedText = '';
 
   // Configuration des chemins pour les workers et core
-  const workerPath = path.join(__dirname, 'node_modules', 'tesseract.js', 'dist', 'worker.min.js');
-  const langPath = path.join(__dirname, 'node_modules', 'tesseract.js', 'lang-data');
+  const workerPath = path.join(__dirname, '..', 'node_modules', 'tesseract.js', 'dist', 'worker.min.js');
+  const langPath = path.join(__dirname, '..', 'node_modules', 'tesseract.js', 'lang-data');
 
   for (let file of files) {
     const filePath = `/tmp/${file.filename}`;
