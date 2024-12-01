@@ -5,7 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["streamifier", "pdf-parse"]  # Exclure les autres modules
+  external_node_modules = ["streamifier", "pdf-parse"]
 
 [[redirects]]
   from = "/*"
