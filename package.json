@@ -6,10 +6,9 @@
     "tesseract.js": "^2.1.1",
     "pdf-lib": "^1.17.0",
     "form-data": "^4.0.0",
-    "busboy": "^1.6.0",
     "streamifier": "^0.1.1",
     "pdf-parse": "^1.1.1",
-    "formidable": "^1.2.2"
+    "aws-lambda-multipart-parser": "^1.1.0"
   },
   "engines": {
     "node": "16.x"
