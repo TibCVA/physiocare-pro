@@ -73,6 +73,9 @@ exports.handler = async (event, context) => {
 async function extractTextFromFiles(files) {
   let extractedText = '';
 
+  // Clé API en dur
+  const OCR_SPACE_API_KEY = 'YOUR_OCR_SPACE_API_KEY'; // Remplacez par votre clé API réelle
+
   for (let file of files) {
     const filePath = `/tmp/${file.filename}`;
 
@@ -88,7 +91,7 @@ async function extractTextFromFiles(files) {
         console.log(`Texte extrait du PDF ${file.filename}`);
       } else if (file.contentType.startsWith('image/')) {
         // Envoyer l'image à OCR.space pour l'OCR
-        const ocrText = await performOCR(filePath);
+        const ocrText = await performOCR(filePath, OCR_SPACE_API_KEY);
         extractedText += ocrText + ' ';
         console.log(`Texte extrait de l'image ${file.filename}`);
       }
@@ -105,9 +108,7 @@ async function extractTextFromFiles(files) {
   return extractedText.trim();
 }
 
-async function performOCR(filePath) {
-  const ocrApiKey = 'K81396052588957'; // Votre clé API OCR.space
-
+async function performOCR(filePath, ocrApiKey) {
   if (!ocrApiKey) {
     throw new Error('La clé API OCR.space n\'est pas définie.');
   }
