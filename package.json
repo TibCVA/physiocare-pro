@@ -9,7 +9,7 @@
     "busboy": "^1.6.0",
     "streamifier": "^0.1.1",
     "pdf-parse": "^1.1.1",
-    "formidable": "^2.0.1"
+    "formidable": "^1.2.2"
   },
   "engines": {
     "node": "16.x"
