@@ -1,27 +1,37 @@
+// netlify/functions/diagnosis.js
+
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Méthode non autorisée. Utilisez POST.' })
+      body: JSON.stringify({ error: 'Méthode non autorisée. Utilisez POST.' }),
     };
   }
 
   try {
     const requestData = JSON.parse(event.body);
 
+    // Extraction des données d'entrée
+    const { profile, symptoms, ocrText } = requestData;
+
     // Validation des données d'entrée
-    if (
-      !requestData.model ||
-      !requestData.messages ||
-      !Array.isArray(requestData.messages) ||
-      !requestData.messages[0]?.content
-    ) {
+    if (!profile || !symptoms || !ocrText) {
       throw new Error(
-        'Données d’entrée invalides. Assurez-vous de fournir un modèle et un message valide.'
+        'Données d’entrée invalides. Assurez-vous de fournir un profil, des symptômes et du texte OCR.'
       );
     }
+
+    // Construction du prompt complet
+    const prompt = `
+      Basé sur les informations suivantes :
+      - Profil du patient : "${profile}"
+      - Symptômes : "${symptoms}"
+      - Résultats de l’analyse OCR : "${ocrText}"
+      
+      Fournissez un diagnostic concis en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements.
+    `;
 
     // Appel à l'API Claude
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -29,7 +39,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
-        'x-api-key': process.env.ANTHROPIC_API_KEY
+        'x-api-key': 'VOTRE_CLE_API_CLAUDE', // Remplacez ceci par votre clé API Claude
       },
       body: JSON.stringify({
         model: 'claude-3-5-haiku-latest',
@@ -37,10 +47,10 @@ exports.handler = async (event) => {
         messages: [
           {
             role: 'user',
-            content: `Donnez un diagnostic concis basé sur les symptômes suivants. Répondez uniquement en points-clés avec des explications synthétiques et pertinentes. Ne proposez pas de solutions ni de traitements. Voici les symptômes : "${requestData.messages[0].content}".`
-          }
-        ]
-      })
+            content: prompt,
+          },
+        ],
+      }),
     });
 
     if (!claudeResponse.ok) {
@@ -53,10 +63,6 @@ exports.handler = async (event) => {
     console.log('Claude API Réponse complète :', claudeData);
 
     // Vérification renforcée de la réponse
-    console.log('Vérification de la réponse Claude :', claudeData.content);
-    console.log('Premier élément de content :', claudeData.content?.[0]);
-    console.log('Texte du diagnostic :', claudeData.content?.[0]?.text);
-
     const diagnosis =
       claudeData.content &&
       Array.isArray(claudeData.content) &&
@@ -72,11 +78,11 @@ exports.handler = async (event) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({
-        content: diagnosis
-      })
+        content: diagnosis,
+      }),
     };
   } catch (error) {
     console.error('Erreur complète:', error);
@@ -85,16 +91,16 @@ exports.handler = async (event) => {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({
         error: error.message || 'Erreur serveur interne.',
         content: [
           {
-            text: "Une erreur est survenue lors du traitement de la requête."
-          }
-        ]
-      })
+            text: "Une erreur est survenue lors du traitement de la requête.",
+          },
+        ],
+      }),
     };
   }
 };
